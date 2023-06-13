@@ -9,6 +9,8 @@ import "react-datepicker/dist/react-datepicker.css"
 import DatePicker from "react-datepicker";
 import React, { useState } from "react";
 
+import { addDays } from "date-fns";
+
 const locales = {
   "en-US": require("date-fns/locale/en-US")
 }
@@ -23,22 +25,58 @@ const localizer = dateFnsLocalizer({
 
 const events = [
   {
-    title: "Big Meeting",
+    title: "Frank -- 100 / 100",
     allDay: true,
-    start: new Date(2023,5,12),
-    end: new Date(2023,5,15)
+    className: "frank",
+    start: new Date(2023,5,11),
+    end: new Date(2023,5,11)
   },
   {
-    title: "Frank",
+    title: "Frank -- 90 / 100",
     allDay: true,
-    start: new Date(2023,5,15),
-    end: new Date(2023,5,19)
+    start: new Date(2023,5,12),
+    end: new Date(2023,5,12)
+  },
+  {
+    title: "Frank -- 80 / 100",
+    allDay: true,
+    start: new Date(2023,5,13),
+    end: new Date(2023,5,13)
+  },
+  {
+    title: "Big Meeting 90 / 100",
+    allDay: true,
+    start: new Date(2023,5,12),
+    end: new Date(2023,5,12)
+  },
+  {
+    title: "Big Meeting 80 / 100",
+    allDay: true,
+    start: new Date(2023,5,13),
+    end: new Date(2023,5,13)
+  },
+  {
+    title: "Big Meeting 80 / 100",
+    allDay: true,
+    start: new Date(2023,5,13),
+    end: new Date(2023,5,13)
+  },
+  {
+    title: "Big Meeting 80 / 100",
+    allDay: true,
+    start: new Date(2023,5,13),
+    end: new Date(2023,5,13)
+  },
+  {
+    title: "Big Meeting 80 / 100",
+    allDay: true,
+    start: new Date(2023,5,13),
+    end: new Date(2023,5,13)
   },
   {
     title: "My Meeting",
-    allDay: true,
-    start: new Date(2023,5,1),
-    end: new Date(2023,5,3)
+    start: new Date(2023,5,2),
+    end: new Date(2023,5,5)
   }
 ]
 
@@ -47,9 +85,15 @@ function App() {
   const [newEvent, setNewEvent] = useState({title: "", start: "", end: ""})
   const [allEvents, setAllEvents] = useState(events)
 
+  // Handing a new event
   const handleAddEvent = () => {
     setAllEvents([...allEvents, newEvent])
   }
+
+  // Handing an event being clicked
+  const handleEventClicked = (e) => {
+    console.log(e.title)
+  };
 
 
   return (
@@ -85,6 +129,7 @@ function App() {
         events={ allEvents }
         startAccessor="start"
         endAccessor="end"
+        onSelectEvent={handleEventClicked}
         style={ {height: 800, margin: "50px"} }
       />
     </div>
