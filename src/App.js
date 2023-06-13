@@ -81,13 +81,13 @@ const events = [
 ];
 
 function App() {
-  const [newEvent, setNewEvent] = useState({ title: "", start: "", end: "" });
+  const [newEvent, setNewEvent] = useState({ title: "", start: "", end: "", projectedHours: '' });
   const [allEvents, setAllEvents] = useState(events);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState({});
   const [currentTitle, setCurrentTitle] = useState('');
   const [newTitle, setNewTitle] = useState("");
-  
+
   const handleModal = () => {
     setModalIsOpen(!modalIsOpen);
   };
@@ -97,10 +97,21 @@ function App() {
     setSelectedEvent(event);
     handleModal();
   };
-  
-    const handleAddEvent = () => {
-      setAllEvents([...allEvents, newEvent]);
+
+  const handleAddEvent = () => {
+    // Pulls information from newEvent Object, then formats it for initial Event Creation
+    const { title, projectedHours } = newEvent;
+    const formattedTitle = `${title} -- ${projectedHours} : ${projectedHours}`;
+
+    // Create a new object with the formatted title and other properties
+    const formattedEvent = {
+      ...newEvent,
+      title: formattedTitle
     };
+
+    // Add the formatted event to the allEvents array
+    setAllEvents([...allEvents, formattedEvent]);
+  };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -121,7 +132,7 @@ function App() {
       }
       return event;
     });
-  
+
     // now you can update the original allEvents array with the updatedEvents array
     setAllEvents(updatedEvents);
   }
@@ -138,6 +149,15 @@ function App() {
           value={newEvent.title}
           onChange={(e) =>
             setNewEvent({ ...newEvent, title: e.target.value })
+          }
+        />
+        <input
+          type="number"
+          placeholder="Enter Projected hours"
+          style={{ width: "10%", marginRight: "10px" }}
+          value={newEvent.projectedHours}
+          onChange={(e) =>
+            setNewEvent({ ...newEvent, projectedHours: e.target.value })
           }
         />
         <DatePicker
