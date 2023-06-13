@@ -9,12 +9,10 @@ import "react-datepicker/dist/react-datepicker.css"
 import DatePicker from "react-datepicker";
 import React, { useState } from "react";
 
-import { addDays } from "date-fns";
-
+// These two consts are needed to allow the calendar to work properly
 const locales = {
   "en-US": require("date-fns/locale/en-US")
 }
-
 const localizer = dateFnsLocalizer({
   format,
   parse,
@@ -23,6 +21,7 @@ const localizer = dateFnsLocalizer({
   locales
 });
 
+// Test Data
 const events = [
   {
     title: "Frank -- 100 / 100",
