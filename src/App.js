@@ -39,9 +39,11 @@ function App() {
   const [allEvents, setAllEvents] = useState(events);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState({});
+
   const [currentTitle, setCurrentTitle] = useState('');
   const [newTitle, setNewTitle] = useState("");
   const [newPerDay, setNewPerDay] = useState('');
+
   const [selectedSlot, setSelectedSlot] = useState(null);
 
 
@@ -60,6 +62,12 @@ function App() {
     let jobName = newEvent.title;
     // This bit will adjust the initial hours
     let hoursLeft = newEvent.projectedHours - newEvent.perDay;
+
+    // Checks to make sure a job doesn't already exist with the same name
+    if (allEvents.some(event => event.jobName === jobName)) {
+      console.log(`An event with job name "${jobName}" already exists`);
+      return;
+    }
 
     // Creates an array to store all the dates in the range given, and adjusts the standard perDay hour rates
     let datesArray = [];
@@ -86,13 +94,21 @@ function App() {
 
   const handleNameChange = (e) => {
     e.preventDefault();
-    if(newTitle !== '') {
-      loopThroughEvents(currentTitle, newTitle)
-      handleModal();
-      setNewTitle('')
-    } else {
-      alert('Name Change can not be blank');
+    console.log(newTitle)
+    // Checks to make sure the job name isn't blank
+    if (newTitle === '') {
+      alert('Name change cannot be blank');
+      return;
     }
+    // Checks the array of jobs and makes sure the job name isn't already in use
+    if (allEvents.some(event => event.jobName === newTitle)) {
+      alert(`An event with title "${newTitle}" already exists.`);
+      return;
+    }
+
+    loopThroughEvents(currentTitle, newTitle);
+    handleModal();
+    setNewTitle('');
   };
 
   const handlePerDayChange = (e) => {
