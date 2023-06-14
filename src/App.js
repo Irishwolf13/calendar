@@ -28,6 +28,7 @@ const events = [];
 function App() {
   const [newEvent, setNewEvent] = useState({
     title: "",
+    jobName: "",
     start: "",
     end: "",
     projectedHours: '',
@@ -39,6 +40,7 @@ function App() {
   const [selectedEvent, setSelectedEvent] = useState({});
   const [currentTitle, setCurrentTitle] = useState('');
   const [newTitle, setNewTitle] = useState("");
+  const [newPerDay, setNewPerDay] = useState('');
   const [selectedSlot, setSelectedSlot] = useState(null);
 
 
@@ -47,15 +49,17 @@ function App() {
   };
 
   const handleEventClicked = (event) => {
-    setCurrentTitle(event.title);
+    console.log(event.jobName)
+    setCurrentTitle(event.jobName);
     setSelectedEvent(event);
     handleModal();
   };
 
   const handleAddEvent = () => {
+    let jobName = newEvent.title;
     // This bit will adjust the initial hours
     let hoursLeft = newEvent.projectedHours - newEvent.perDay;
-  
+
     // Creates an array to store all the dates in the range given, and adjusts the standard perDay hour rates
     let datesArray = [];
     for (let date = new Date(newEvent.start); date <= newEvent.end; date.setDate(date.getDate() + 1)) {
@@ -65,6 +69,7 @@ function App() {
         datesArray.push({
           ...newEvent,
           title,
+          jobName: jobName,
           start: new Date(date),
           end: new Date(date),
           eventIndex: datesArray.length
@@ -72,25 +77,28 @@ function App() {
         hoursLeft -= newEvent.perDay;
       }
     }
-  
+    console.log(jobName)
     // Creates all the events
     setAllEvents([...allEvents, ...datesArray]);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleNameChange = (e) => {
     e.preventDefault();
     // I think here I'm going to want to loop through events and find the one with same title.
     // This is the first step for creating the adjusting values for each day of an event
     loopThroughEvents(currentTitle, newTitle)
-
     handleModal();
     setNewTitle('')
   };
 
+  const handlePerDayChange = (e) => {
+    // This bit is going to be a little harder than a name change, so it gets its own function.
+  };
+
   const loopThroughEvents = (titleToFind, changeTitle) => {
     const updatedEvents = allEvents.map(event => {
-      console.log("Event Title: ",changeTitle)
-      console.log("To Find: ", titleToFind)
+      // console.log("Event Title: ",changeTitle)
+      // console.log("To Find: ", titleToFind)
       if (event.title === titleToFind) {
         return { ...event, title: changeTitle };
       }
@@ -164,20 +172,26 @@ function App() {
       <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
         <h2>{selectedEvent.title}</h2>
         <div>
-        <form onSubmit={handleFormSubmit}>
+        <form onSubmit={handleNameChange}>
           <label>
-            New Title:
+            Name Change :
             <input
               type="text"
-              placeholder={selectedEvent.title}
+              placeholder={selectedEvent.jobName}
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
             />
+          </label>
+          <button type="submit">Submit</button>
+        </form>
+        <form onSubmit={handlePerDayChange}>
+          <label>
+            Hours Per Day :
             <input
               type="number"
               placeholder={selectedEvent.perDay}
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
+              value={newPerDay}
+              onChange={(e) => setNewPerDay(e.target.value)}
             />
           </label>
           <button type="submit">Submit</button>
@@ -189,3 +203,10 @@ function App() {
 }
 
 export default App;
+
+{/* <input
+type="number"
+placeholder={selectedEvent.perDay}
+value={newPerDay}
+onChange={(e) => setNewPerDay(e.target.value)}
+/> */}
