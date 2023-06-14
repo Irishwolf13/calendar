@@ -1,5 +1,5 @@
 import "./App.css";
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
+import { Calendar, dateFnsLocalizer} from "react-big-calendar";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
@@ -30,54 +30,7 @@ const events = [
     className: "frank",
     start: new Date(2023, 5, 11),
     end: new Date(2023, 5, 11),
-  },
-  {
-    title: "Frank -- 90 / 100",
-    allDay: true,
-    start: new Date(2023, 5, 12),
-    end: new Date(2023, 5, 12),
-  },
-  {
-    title: "Frank -- 80 / 100",
-    allDay: true,
-    start: new Date(2023, 5, 13),
-    end: new Date(2023, 5, 13),
-  },
-  {
-    title: "Big Meeting 90 / 100",
-    allDay: true,
-    start: new Date(2023, 5, 12),
-    end: new Date(2023, 5, 12),
-  },
-  {
-    title: "Big Meeting 80 / 100",
-    allDay: true,
-    start: new Date(2023, 5, 13),
-    end: new Date(2023, 5, 13),
-  },
-  {
-    title: "Big Meeting 80 / 100",
-    allDay: true,
-    start: new Date(2023, 5, 13),
-    end: new Date(2023, 5, 13),
-  },
-  {
-    title: "Big Meeting 80 / 100",
-    allDay: true,
-    start: new Date(2023, 5, 13),
-    end: new Date(2023, 5, 13),
-  },
-  {
-    title: "Big Meeting 80 / 100",
-    allDay: true,
-    start: new Date(2023, 5, 13),
-    end: new Date(2023, 5, 13),
-  },
-  {
-    title: "My Meeting",
-    start: new Date(2023, 5, 2),
-    end: new Date(2023, 5, 5),
-  },
+  }
 ];
 
 function App() {
@@ -87,6 +40,8 @@ function App() {
   const [selectedEvent, setSelectedEvent] = useState({});
   const [currentTitle, setCurrentTitle] = useState('');
   const [newTitle, setNewTitle] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  
 
   const handleModal = () => {
     setModalIsOpen(!modalIsOpen);
@@ -99,18 +54,29 @@ function App() {
   };
 
   const handleAddEvent = () => {
-    // Pulls information from newEvent Object, then formats it for initial Event Creation
+    // Pull information from newEvent Object, then format it for initial Event Creation
     const { title, projectedHours } = newEvent;
     const formattedTitle = `${title} -- ${projectedHours} : ${projectedHours}`;
-
-    // Create a new object with the formatted title and other properties
-    const formattedEvent = {
+  
+    // Get all the dates from start to end.
+    // Create an empty array to store the date objects
+    let datesArray = [];
+  
+    // Loop through each day between the start and end dates, adding it to the array
+    for (let date = new Date(newEvent.start); date <= newEvent.end; date.setDate(date.getDate() + 1)) {
+      datesArray.push(new Date(date));
+    }
+  
+    // Map over the dates array and create a new event with the formatted title for each date
+    const newEvents = datesArray.map((date) => ({
       ...newEvent,
-      title: formattedTitle
-    };
-
-    // Add the formatted event to the allEvents array
-    setAllEvents([...allEvents, formattedEvent]);
+      title: formattedTitle,
+      start: new Date(date), // Set the start of the event to the current date in the loop
+      end: new Date(date), // Set the end of the event to the current date in the loop
+    }));
+  
+    // Add each new event to the allEvents array using the spread operator
+    setAllEvents([...allEvents, ...newEvents]);
   };
 
   const handleFormSubmit = (e) => {
@@ -184,6 +150,8 @@ function App() {
         endAccessor="end"
         onSelectEvent={handleEventClicked}
         style={{ height: 800, margin: "50px" }}
+        selectable={true}
+        onSelectSlot={(slotInfo) => setSelectedSlot({ start: slotInfo.start, end: slotInfo.end })}
       />
 
       <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
