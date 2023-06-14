@@ -53,28 +53,28 @@ function App() {
   };
 
   const handleAddEvent = () => {
-    // Pull information from newEvent Object, then format it for initial Event Creation
+    // This bit will adjust the initial hours
     let hoursLeft = newEvent.projectedHours - newEvent.perDay;
-    const formattedTitle = `${newEvent.title} -- ${hoursLeft} : ${newEvent.projectedHours}`;
-
-    // Get all the dates from start to end.
+  
+    // Creates an array to store all the dates in the range given, and adjusts the standard perDay hour rates
     let datesArray = [];
-    // Loop through each day between the start and end dates, adding it to the array
     for (let date = new Date(newEvent.start); date <= newEvent.end; date.setDate(date.getDate() + 1)) {
-      datesArray.push(new Date(date));
+      const dayOfWeek = date.getDay();              // get day of week (0 is Sunday, 6 is Saturday)
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) {     // skip weekends
+        const title = `${newEvent.title} -- ${hoursLeft} : ${newEvent.projectedHours}`;
+        datesArray.push({
+          ...newEvent,
+          title,
+          start: new Date(date),
+          end: new Date(date),
+          eventIndex: datesArray.length
+        });
+        hoursLeft -= newEvent.perDay;
+      }
     }
-
-    // Map over the dates array and create a new event with the formatted title for each date
-    const newEvents = datesArray.map((date, index) => ({
-      ...newEvent,
-      title: formattedTitle,
-      start: new Date(date), // Set the start of the event to the current date in the loop
-      end: new Date(date), // Set the end of the event to the current date in the loop
-      eventIndex: index, // Set the event number
-    }));
-
-    // Add each new event to the allEvents array using the spread operator
-    setAllEvents([...allEvents, ...newEvents]);
+  
+    // Creates all the events
+    setAllEvents([...allEvents, ...datesArray]);
   };
 
   const handleFormSubmit = (e) => {
@@ -170,6 +170,12 @@ function App() {
             <input
               type="text"
               placeholder={selectedEvent.title}
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder={selectedEvent.perDay}
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
             />
