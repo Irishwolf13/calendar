@@ -33,6 +33,7 @@ function App() {
     end: "",
     projectedHours: '',
     perDay: '',
+    hoursLeft: '',
     eventIndex: ''
   });
   const [allEvents, setAllEvents] = useState(events);
@@ -49,7 +50,7 @@ function App() {
   };
 
   const handleEventClicked = (event) => {
-    console.log(event.jobName)
+    // console.log(event.jobName)
     setCurrentTitle(event.jobName);
     setSelectedEvent(event);
     handleModal();
@@ -65,11 +66,12 @@ function App() {
     for (let date = new Date(newEvent.start); date <= newEvent.end; date.setDate(date.getDate() + 1)) {
       const dayOfWeek = date.getDay();              // get day of week (0 is Sunday, 6 is Saturday)
       if (dayOfWeek !== 0 && dayOfWeek !== 6) {     // skip weekends
-        const title = `${newEvent.title} -- ${hoursLeft} : ${newEvent.projectedHours}`;
+        const title = `${newEvent.title} -- ${newEvent.perDay} / ${hoursLeft}`;
         datesArray.push({
           ...newEvent,
           title,
           jobName: jobName,
+          hoursLeft: hoursLeft,
           start: new Date(date),
           end: new Date(date),
           eventIndex: datesArray.length
@@ -77,21 +79,24 @@ function App() {
         hoursLeft -= newEvent.perDay;
       }
     }
-    console.log(jobName)
+    // console.log(jobName)
     // Creates all the events
     setAllEvents([...allEvents, ...datesArray]);
   };
 
   const handleNameChange = (e) => {
     e.preventDefault();
-    // I think here I'm going to want to loop through events and find the one with same title.
-    // This is the first step for creating the adjusting values for each day of an event
-    loopThroughEvents(currentTitle, newTitle)
-    handleModal();
-    setNewTitle('')
+    if(newTitle !== '') {
+      loopThroughEvents(currentTitle, newTitle)
+      handleModal();
+      setNewTitle('')
+    } else {
+      alert('Name Change can not be blank');
+    }
   };
 
   const handlePerDayChange = (e) => {
+    e.preventDefault();
     // This bit is going to be a little harder than a name change, so it gets its own function.
   };
 
@@ -99,8 +104,12 @@ function App() {
     const updatedEvents = allEvents.map(event => {
       // console.log("Event Title: ",changeTitle)
       // console.log("To Find: ", titleToFind)
-      if (event.title === titleToFind) {
-        return { ...event, title: changeTitle };
+      if (event.jobName === titleToFind) {
+        return {
+          ...event,
+          jobName: changeTitle,
+          title: `${changeTitle} -- ${event.perDay} / ${event.hoursLeft}`
+        };
       }
       return event;
     });
