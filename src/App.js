@@ -23,25 +23,24 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-const events = [
-  {
-    title: "Frank -- 100 / 100",
-    allDay: true,
-    className: "frank",
-    start: new Date(2023, 5, 11),
-    end: new Date(2023, 5, 11),
-  }
-];
+const events = [];
 
 function App() {
-  const [newEvent, setNewEvent] = useState({ title: "", start: "", end: "", projectedHours: '' });
+  const [newEvent, setNewEvent] = useState({
+    title: "",
+    start: "",
+    end: "",
+    projectedHours: '',
+    perDay: '',
+    eventIndex: ''
+  });
   const [allEvents, setAllEvents] = useState(events);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState({});
   const [currentTitle, setCurrentTitle] = useState('');
   const [newTitle, setNewTitle] = useState("");
   const [selectedSlot, setSelectedSlot] = useState(null);
-  
+
 
   const handleModal = () => {
     setModalIsOpen(!modalIsOpen);
@@ -55,26 +54,25 @@ function App() {
 
   const handleAddEvent = () => {
     // Pull information from newEvent Object, then format it for initial Event Creation
-    const { title, projectedHours } = newEvent;
-    const formattedTitle = `${title} -- ${projectedHours} : ${projectedHours}`;
-  
+    let hoursLeft = newEvent.projectedHours - newEvent.perDay;
+    const formattedTitle = `${newEvent.title} -- ${hoursLeft} : ${newEvent.projectedHours}`;
+
     // Get all the dates from start to end.
-    // Create an empty array to store the date objects
     let datesArray = [];
-  
     // Loop through each day between the start and end dates, adding it to the array
     for (let date = new Date(newEvent.start); date <= newEvent.end; date.setDate(date.getDate() + 1)) {
       datesArray.push(new Date(date));
     }
-  
+
     // Map over the dates array and create a new event with the formatted title for each date
-    const newEvents = datesArray.map((date) => ({
+    const newEvents = datesArray.map((date, index) => ({
       ...newEvent,
       title: formattedTitle,
       start: new Date(date), // Set the start of the event to the current date in the loop
       end: new Date(date), // Set the end of the event to the current date in the loop
+      eventIndex: index, // Set the event number
     }));
-  
+
     // Add each new event to the allEvents array using the spread operator
     setAllEvents([...allEvents, ...newEvents]);
   };
@@ -124,6 +122,15 @@ function App() {
           value={newEvent.projectedHours}
           onChange={(e) =>
             setNewEvent({ ...newEvent, projectedHours: e.target.value })
+          }
+        />
+        <input
+          type="number"
+          placeholder="Enter Daily Hours"
+          style={{ width: "10%", marginRight: "10px" }}
+          value={newEvent.perDay}
+          onChange={(e) =>
+            setNewEvent({ ...newEvent, perDay: e.target.value })
           }
         />
         <DatePicker
