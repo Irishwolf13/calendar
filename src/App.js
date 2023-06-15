@@ -52,7 +52,6 @@ function App() {
   };
 
   const handleEventClicked = (event) => {
-    // console.log(event.jobName)
     setCurrentTitle(event.jobName);
     setSelectedEvent(event);
     handleModal();
@@ -77,7 +76,7 @@ function App() {
         const title = `${newEvent.title} -- ${newEvent.perDay} / ${hoursLeft}`;
         datesArray.push({
           ...newEvent,
-          title,
+          title: title,
           jobName: jobName,
           hoursLeft: hoursLeft,
           start: new Date(date),
@@ -87,14 +86,12 @@ function App() {
         hoursLeft -= newEvent.perDay;
       }
     }
-    // console.log(jobName)
     // Creates all the events
     setAllEvents([...allEvents, ...datesArray]);
   };
 
   const handleNameChange = (e) => {
     e.preventDefault();
-    console.log(newTitle)
     // Checks to make sure the job name isn't blank
     if (newTitle === '') {
       alert('Name change cannot be blank');
@@ -113,13 +110,49 @@ function App() {
 
   const handlePerDayChange = (e) => {
     e.preventDefault();
+    // console.log(selectedEvent);
+    // Grab the user's input
+    let userInput = newPerDay
     // This bit is going to be a little harder than a name change, so it gets its own function.
+    // Loop through the events, find events with the same name && indext = or greater than current
+    // get the difference between the current perDay and the new perDay and subtract that from the hours
+    // remaining.
+    loopThroughEventsForHours(selectedEvent.jobName, selectedEvent.eventIndex, userInput)
   };
+
+  const loopThroughEventsForHours = (titleToFind, myIndex, newPerDay) => {
+    let newHoursLeft = 0;
+    const updatedEvents = allEvents.map(event => {
+      if (event.jobName === titleToFind  && myIndex == event.eventIndex) {
+        // console.log("newPayDay: ", newPerDay)
+        // console.log("event.perDay: ", event.perDay)
+        // console.log("event.hoursLeft: ", event.hoursLeft)
+        newHoursLeft = event.hoursLeft - (newPerDay - event.perDay)
+        let title = `${event.jobName} -- ${newPerDay} / ${newHoursLeft}`
+        return {
+          ...event,
+          perDay: newPerDay,
+          title: title,
+          hoursLeft: newHoursLeft
+        };
+      }
+      if (event.jobName === titleToFind  && myIndex <= event.eventIndex) {
+        newHoursLeft = (newHoursLeft - event.perDay)
+        let title = `${event.jobName} -- ${event.perDay} / ${newHoursLeft}`
+          return {
+            ...event,
+            title: title,
+            hoursLeft: newHoursLeft
+          };
+      }
+      return event;
+    });
+    // now you can update the original allEvents array with the updatedEvents array
+    setAllEvents(updatedEvents);
+  }
 
   const loopThroughEvents = (titleToFind, changeTitle) => {
     const updatedEvents = allEvents.map(event => {
-      // console.log("Event Title: ",changeTitle)
-      // console.log("To Find: ", titleToFind)
       if (event.jobName === titleToFind) {
         return {
           ...event,
