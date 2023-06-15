@@ -10,6 +10,7 @@ import DatePicker from "react-datepicker";
 import React, { useState } from "react";
 import Modal from "react-modal";
 import ReactModal from "react-modal";
+import myImage from './images/reliable_design_logo2.jpg';
 ReactModal.setAppElement("#root");
 
 const locales = {
@@ -185,9 +186,8 @@ function App() {
 
   return (
     <div className="App">
-      <img src="./src/images/reliable_design_logo.PNG" alt="Reliable Design Logo"/>
-      <h1>Calendar</h1>
-      <h2>Add New Event</h2>
+      <img className="mainLogo" src={myImage} alt="Reliable Design Logo"/>
+      <button>Add New Event</button>
       <div className="mainContainer">
         <input
           type="text"
