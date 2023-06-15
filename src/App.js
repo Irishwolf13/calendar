@@ -64,8 +64,10 @@ function App() {
     let hoursLeft = newEvent.projectedHours - newEvent.perDay;
 
     // Checks to make sure a job doesn't already exist with the same name
-    if (allEvents.some(event => event.jobName === jobName)) alert(`An event with job name "${jobName}" already exists`);
-
+    if (allEvents.some(event => event.jobName === jobName)) {
+      alert(`An event with job name "${jobName}" already exists`);
+      return
+    }
     // Creates all the events
     let datesArray = [];
     for (let date = new Date(newEvent.start); date <= newEvent.end; date.setDate(date.getDate() + 1)) {
@@ -91,8 +93,13 @@ function App() {
   const handleNameChange = (e) => {
     e.preventDefault();
     // Checks to make sure the job name isn't blank or in use
-    if (newTitle === '') alert('Name change cannot be blank');
-    if (allEvents.some(event => event.jobName === newTitle)) alert(`An event with title "${newTitle}" already exists.`);
+    if (newTitle === '') {
+      alert('Name change cannot be blank');
+      return
+    } else if (allEvents.some(event => event.jobName === newTitle)) {
+      alert(`An event with title "${newTitle}" already exists.`);
+      return
+    }
 
     changeEventTitles(currentTitle, newTitle);
     handleModal(); // Closes Modal
