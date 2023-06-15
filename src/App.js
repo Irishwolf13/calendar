@@ -144,7 +144,7 @@ function App() {
   const changeEventPerDayHours = (titleToFind, myIndex, newPerDay) => {
     let newHoursLeft = 0;
     const updatedEvents = allEvents.map(event => {
-      if (event.jobName === titleToFind && myIndex == event.eventIndex) {
+      if (event.jobName === titleToFind && myIndex === event.eventIndex) {
         newHoursLeft = event.hoursLeft - (newPerDay - event.perDay)
         return {
           ...event,
@@ -185,13 +185,14 @@ function App() {
 
   return (
     <div className="App">
+      <img src="./src/images/reliable_design_logo.PNG" alt="Reliable Design Logo"/>
       <h1>Calendar</h1>
       <h2>Add New Event</h2>
-      <div>
+      <div className="mainContainer">
         <input
           type="text"
           placeholder="Add Title for Event"
-          style={{ width: "20%", marginRight: "10px" }}
+          className="titleInput"
           value={newEvent.title}
           onChange={(e) =>
             setNewEvent({ ...newEvent, title: e.target.value })
@@ -200,7 +201,6 @@ function App() {
         <input
           type="number"
           placeholder="Enter Projected hours"
-          style={{ width: "10%", marginRight: "10px" }}
           value={newEvent.projectedHours}
           onChange={(e) =>
             setNewEvent({ ...newEvent, projectedHours: e.target.value })
@@ -209,7 +209,6 @@ function App() {
         <input
           type="number"
           placeholder="Enter Daily Hours"
-          style={{ width: "10%", marginRight: "10px" }}
           value={newEvent.perDay}
           onChange={(e) =>
             setNewEvent({ ...newEvent, perDay: e.target.value })
@@ -217,7 +216,6 @@ function App() {
         />
         <DatePicker
           placeholderText="Start Date"
-          style={{ marginRight: "10px" }}
           selected={newEvent.start}
           onChange={(start) => setNewEvent({ ...newEvent, start })}
         />

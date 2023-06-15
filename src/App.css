@@ -1,3 +1,11 @@
 .App {
   text-align: center;
 }
+
+.mainContainer {
+  background-color: aqua;
+}
+
+.mainContainer input {
+  width: 15%;
+}
