@@ -1,5 +1,7 @@
 import "./App.css";
 import { Calendar, dateFnsLocalizer} from "react-big-calendar";
+import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop'
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
@@ -8,11 +10,12 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
 import React, { useState } from "react";
-import Modal from "react-modal";
+// import Modal from "react-modal";
 import ReactModal from "react-modal";
 import myImage from './images/reliable_design_logo2.jpg';
 ReactModal.setAppElement("#root");
 
+const DnDCalendar = withDragAndDrop(Calendar)
 const locales = {
   "en-US": require("date-fns/locale/en-US"),
 };
@@ -23,7 +26,6 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
-
 const events = [];
 
 function App() {
@@ -45,9 +47,6 @@ function App() {
   const [newTitle, setNewTitle] = useState("");
   const [newPerDay, setNewPerDay] = useState('');
   const [newProjection, setNewProjection] = useState('');
-
-  const [selectedSlot, setSelectedSlot] = useState(null);
-
 
   const handleModal = () => {
     setModalIsOpen(!modalIsOpen);
@@ -79,10 +78,10 @@ function App() {
           ...newEvent,
           title: title,
           jobName: jobName,
-          initalHours: newEvent.projectedHours,
-          hoursLeft: hoursLeft,
           start: new Date(date),
           end: new Date(date),
+          initalHours: newEvent.projectedHours,
+          hoursLeft: hoursLeft,
           eventIndex: datesArray.length
         });
         hoursLeft -= newEvent.perDay;
@@ -184,8 +183,58 @@ function App() {
     setAllEvents(updatedEvents);
   }
 
+  function onEventDrop({event, start, end, allDay}) {
+    console.log("Event", event)
+    console.log("start", start)
+    console.log("end", end)
+  }
+  function onDragStart({event}) {console.log("dragStart")}
+
   return (
     <div className="App">
+
+      <ReactModal overlayClassName="Overlay" className="modalBasic" isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
+        <h2>{selectedEvent.title}</h2>
+        <div>
+        <form onSubmit={handleNameChange}>
+          <label>
+            Name Change :
+            <input
+              type="text"
+              placeholder={selectedEvent.jobName}
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+            />
+          </label>
+          <button type="submit">Submit</button>
+        </form>
+        <form onSubmit={handleProjectionChange}>
+          <label>
+            Job Projection :
+            <input
+              type="number"
+              placeholder={selectedEvent.initalHours}
+              value={newProjection}
+              onChange={(e) => setNewProjection(e.target.value)}
+            />
+          </label>
+          <button type="submit">Submit</button>
+        </form>
+        <form onSubmit={handlePerDayChange}>
+          <label>
+            Hours Per Day :
+            <input
+              type="number"
+              placeholder={selectedEvent.perDay}
+              value={newPerDay}
+              onChange={(e) => setNewPerDay(e.target.value)}
+            />
+          </label>
+          <button type="submit">Submit</button>
+        </form>
+        </div>
+      </ReactModal>
+
       <img className="mainLogo" src={myImage} alt="Reliable Design Logo"/>
       <button>Add New Event</button>
       <div className="mainContainer">
@@ -230,58 +279,19 @@ function App() {
         </button>
       </div>
 
-      <Calendar
+      <DnDCalendar
         localizer={localizer}
         events={allEvents}
         startAccessor="start"
         endAccessor="end"
         onSelectEvent={handleEventClicked}
-        style={{ height: 800, margin: "50px" }}
+        style={{ height: 800, margin: "50px", zIndex: 1 }}
         selectable={true}
-        onSelectSlot={(slotInfo) => setSelectedSlot({ start: slotInfo.start, end: slotInfo.end })}
+        resizable={false}
+        draggableAccessor={(event) => true}
+        onEventDrop={onEventDrop}
+        onDragStart={onDragStart}
       />
-
-      <Modal isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
-        <h2>{selectedEvent.title}</h2>
-        <div>
-        <form onSubmit={handleNameChange}>
-          <label>
-            Name Change :
-            <input
-              type="text"
-              placeholder={selectedEvent.jobName}
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-            />
-          </label>
-          <button type="submit">Submit</button>
-        </form>
-        <form onSubmit={handleProjectionChange}>
-          <label>
-            Job Projection :
-            <input
-              type="number"
-              placeholder={selectedEvent.initalHours}
-              value={newProjection}
-              onChange={(e) => setNewProjection(e.target.value)}
-            />
-          </label>
-          <button type="submit">Submit</button>
-        </form>
-        <form onSubmit={handlePerDayChange}>
-          <label>
-            Hours Per Day :
-            <input
-              type="number"
-              placeholder={selectedEvent.perDay}
-              value={newPerDay}
-              onChange={(e) => setNewPerDay(e.target.value)}
-            />
-          </label>
-          <button type="submit">Submit</button>
-        </form>
-        </div>
-      </Modal>
     </div>
   );
 }
