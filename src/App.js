@@ -183,11 +183,58 @@ function App() {
     setAllEvents(updatedEvents);
   }
 
-  function onEventDrop({event, start, end, allDay}) {
-    console.log("Event", event)
-    console.log("start", start)
-    console.log("end", end)
+  const changeEventDates = (titleToFind, newStartDate) => {
+    const updatedEvents = allEvents.map(event => {
+      if (event.jobName === titleToFind) {
+        return {
+          ...event,
+          start: newStartDate,
+          end: newStartDate
+        };
+      }
+      return event;
+    });
+
+    // now you can update the original allEvents array with the updatedEvents array
+    setAllEvents(updatedEvents);
   }
+
+  function onEventDrop({event, start, end, allDay}) {
+    // Difference between original event start date and new start date
+    const differenceOfDates = start.getTime() - event.start.getTime();
+
+    // Declare updated events as an empty array to avoid a reference error
+    let updatedEvents = [];
+
+    // Map over all events and update the start and end dates based on the differenceOfDates
+    updatedEvents = allEvents.map((currentEvent, index) => {
+      if(currentEvent.jobName === event.jobName && currentEvent.eventIndex >= event.eventIndex){
+        let adjustedStart = new Date(currentEvent.start.getTime() + differenceOfDates);
+        let adjustedEnd = new Date(currentEvent.end.getTime() + differenceOfDates);
+
+        const previousEvent = updatedEvents[index - 1];
+
+        // Set start date to the day after previous event's end date
+        if(previousEvent){
+          adjustedStart.setDate(previousEvent.end.getDate() + 1);
+          adjustedEnd.setDate(previousEvent.end.getDate() + 1);
+        }
+
+        return {
+          ...currentEvent,
+          start: adjustedStart,
+          end: adjustedEnd
+        }
+      } else {
+        return {...currentEvent}
+      }
+    });
+
+    // Set the updated events using setAllEvents function
+    setAllEvents(updatedEvents);
+  }
+
+
   function onDragStart({event}) {console.log("dragStart")}
 
   return (
