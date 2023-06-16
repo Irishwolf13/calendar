@@ -200,6 +200,14 @@ function App() {
   }
 
   function onEventDrop({event, start, end, allDay}) {
+    // Make sure events can't have a date earlier than their previous Index
+    if(event.eventIndex > 0) {
+      const prevEvent = allEvents.find(e => e.jobName === event.jobName && e.eventIndex === event.eventIndex - 1);
+      if (start.getTime() <= prevEvent.start.getTime()) {
+        return
+      }
+    }
+
     // Difference between original event start date and new start date
     const differenceOfDates = start.getTime() - event.start.getTime();
 
@@ -235,7 +243,7 @@ function App() {
   }
 
 
-  function onDragStart({event}) {console.log("dragStart")}
+  function onDragStart({event}) {}
 
   return (
     <div className="App">
