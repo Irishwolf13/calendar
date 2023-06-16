@@ -199,6 +199,42 @@ function App() {
     setAllEvents(updatedEvents);
   }
 
+  const handleRemoveDay = (event, jobName) => {
+    let currentEvents = allEvents.filter(event => event.jobName === jobName);
+    let filteredEvents = allEvents.filter((currentEvent) => currentEvent.jobName !== jobName);
+    currentEvents.pop();
+    const updatedEvents = [...filteredEvents, ...currentEvents];
+    setAllEvents(updatedEvents);
+    handleModal();
+  }
+
+  const handleAddDay = (event, jobName) => {
+    const filteredEvents = allEvents.filter(event => event.jobName === jobName);
+    const highestEvent = filteredEvents.reduce((highest, current) => {
+      if (current.eventIndex > highest.eventIndex) {
+        return current;
+      } else {
+        return highest;
+      }
+    }, { eventIndex: -1 });
+
+    // Create a new Date object with highestEvent.start and add one day
+    let newStartDate = new Date(highestEvent.start.getTime() + (24 * 60 * 60 * 1000));
+
+    // Creates a copy of the previous last event, and adjusts the new info
+    let newEvent = Object.assign({}, highestEvent);
+    newEvent.eventIndex = highestEvent.eventIndex + 1
+    newEvent.hoursLeft = highestEvent.hoursLeft - newEvent.perDay
+    newEvent.start = newStartDate;
+    newEvent.end = newStartDate;
+    newEvent.title = `${newEvent.jobName} -- ${newEvent.perDay} / ${newEvent.hoursLeft}`;
+
+    // Update the state with the new array of events
+    const updatedEvents = [...allEvents, newEvent];
+    setAllEvents(updatedEvents);
+  }
+
+
   function onEventDrop({event, start, end, allDay}) {
     // Make sure events can't have a date earlier than their previous Index
     if(event.eventIndex > 0) {
@@ -249,6 +285,8 @@ function App() {
     <div className="App">
 
       <ReactModal overlayClassName="Overlay" className="modalBasic" isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
+        <button className="deleteButton" onClick={(e) => handleAddDay(e, selectedEvent.jobName)}>Add Day</button>
+        <button className="deleteButton" onClick={(e) => handleRemoveDay(e, selectedEvent.jobName)}>Remove Day</button>
         <h2>{selectedEvent.title}</h2>
         <div>
         <form onSubmit={handleNameChange}>

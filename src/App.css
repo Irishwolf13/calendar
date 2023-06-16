@@ -15,6 +15,13 @@
   max-height: 150px;
 }
 
+/* ***************** Buttons ***************** */
+.deleteButton {
+  position: relative;
+  left: 100px;
+}
+
+/* ***************** MODAL INFORMATION ***************** */
 .modalBasic {
   background-color: rgb(255, 255, 255);
   border: solid 2px black;
