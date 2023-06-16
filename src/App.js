@@ -47,6 +47,7 @@ function App() {
   const [newTitle, setNewTitle] = useState("");
   const [newPerDay, setNewPerDay] = useState('');
   const [newProjection, setNewProjection] = useState('');
+  const [formattedDate, setFormattedDate] = useState("");
 
   const handleModal = () => {
     setModalIsOpen(!modalIsOpen);
@@ -55,6 +56,12 @@ function App() {
   const handleEventClicked = (event) => {
     setCurrentTitle(event.jobName);
     setSelectedEvent(event);
+    let currentDate = event.start.toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric'
+    });
+    setFormattedDate(currentDate)
     handleModal();
   };
 
@@ -205,7 +212,7 @@ function App() {
     currentEvents.pop();
     const updatedEvents = [...filteredEvents, ...currentEvents];
     setAllEvents(updatedEvents);
-    handleModal();
+    // handleModal(); // Not sure I want this to close yet...
   }
 
   const handleAddDay = (event, jobName) => {
@@ -232,6 +239,8 @@ function App() {
     // Update the state with the new array of events
     const updatedEvents = [...allEvents, newEvent];
     setAllEvents(updatedEvents);
+
+    // handleModal(); // Not sure I want this to close yet...
   }
 
 
@@ -287,7 +296,7 @@ function App() {
       <ReactModal overlayClassName="Overlay" className="modalBasic" isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
         <button className="deleteButton" onClick={(e) => handleAddDay(e, selectedEvent.jobName)}>Add Day</button>
         <button className="deleteButton" onClick={(e) => handleRemoveDay(e, selectedEvent.jobName)}>Remove Day</button>
-        <h2>{selectedEvent.title}</h2>
+        <h2>{`${selectedEvent.jobName} - ${formattedDate}`}</h2>
         <div>
         <form onSubmit={handleNameChange}>
           <label>
