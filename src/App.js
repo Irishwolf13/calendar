@@ -335,6 +335,7 @@ function App() {
           <button type="submit">Submit</button>
         </form>
         </div>
+        <button className="closeModalButton" onClick={handleModal}>Close</button>
       </ReactModal>
 
       <img className="mainLogo" src={myImage} alt="Reliable Design Logo"/>

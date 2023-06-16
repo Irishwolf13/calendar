@@ -21,6 +21,12 @@
   left: 100px;
 }
 
+.closeModalButton {
+  position: relative;
+  left: 150px;
+  margin-top: 10px;
+}
+
 /* ***************** MODAL INFORMATION ***************** */
 .modalBasic {
   background-color: rgb(255, 255, 255);
