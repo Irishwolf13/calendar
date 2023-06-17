@@ -13,6 +13,7 @@ import React, { useState } from "react";
 // import Modal from "react-modal";
 import ReactModal from "react-modal";
 import myImage from './images/reliable_design_logo2.jpg';
+
 ReactModal.setAppElement("#root");
 
 const DnDCalendar = withDragAndDrop(Calendar)
@@ -34,10 +35,11 @@ function App() {
     jobName: "",
     start: "",
     end: "",
-    projectedHours: '',
-    perDay: '',
-    hoursLeft: '',
-    eventIndex: ''
+    projectedHours: "",
+    perDay: "",
+    hoursLeft: "",
+    eventIndex: "",
+    eventColor: "green"
   });
 
   const [allEvents, setAllEvents] = useState(events);
@@ -54,19 +56,6 @@ function App() {
   const handleModal = (mySetModal, myModal) => {
     mySetModal(!myModal);
   };
-
-  function showNewEventEditor() {
-    var mainContainer = document.querySelector('.mainContainer');
-    if (mainContainer.classList.contains('hidden')) {
-      mainContainer.classList.remove('hidden'); // Show the main container
-      mainContainer.classList.add('expanded'); // Expand the main container
-    } else {
-      mainContainer.classList.remove('expanded'); // Collapse the main container
-      setTimeout(function() {
-        mainContainer.classList.add('hidden'); // Hide the main container after the animation finishes
-      }, 300); // Wait for the animation to finish
-    }
-  }
 
   const handleEventClicked = (event) => {
     setCurrentTitle(event.jobName);
@@ -119,7 +108,8 @@ function App() {
       projectedHours: '',
       perDay: '',
       hoursLeft: '',
-      eventIndex: ''
+      eventIndex: '',
+      eventColor: 'yellow'
     })
   };
 
@@ -313,8 +303,11 @@ function App() {
     setAllEvents(updatedEvents);
   }
 
+  const handleColorDropdownChange = (e) => {
+    setNewEvent({ ...newEvent, eventColor: e.target.value });
+  }
+
   const onSelectSlot = (e) => {
-    console.log(e)
     setNewEvent({ ...newEvent, start: e.start, end: e.end })
     handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen)
   }
@@ -425,6 +418,16 @@ function App() {
 
           </div>
           <br></br>
+          <select className="colorDropdown" onChange={handleColorDropdownChange}>
+            <option value="blue" >Default Color</option>
+            <option value="red" >Red</option>
+            <option value="green" >Green</option>
+            <option value="blue" >Blue</option>
+            <option value="yellow" >Yellow</option>
+            <option value="orange" >Orange</option>
+            <option value="purple" >Purple</option>
+          </select>
+          <br></br>
           <button className="addEventButton" onClick={handleAddEvent}>
             {" "}
             Add Event{" "}
@@ -445,6 +448,16 @@ function App() {
           onEventDrop={onEventDrop}
           onDragStart={onDragStart}
           onSelectSlot={onSelectSlot}
+          eventPropGetter={(event) =>
+            event.eventColor
+              ? {
+                  style: {
+                    background: event.eventColor,
+                    color: event.eventColor === 'red' || event.eventColor === 'yellow' || event.eventColor === 'orange' ? 'black' : ''
+                  }
+                }
+              : {}
+          }
         />
       </div>
     </div>

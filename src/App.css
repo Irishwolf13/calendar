@@ -45,7 +45,8 @@ br {
 
 .deleteButton {
   position: relative;
-  left: 100px;
+  left: 50px;
+  margin-right: 5px;
 }
 
 .closeModalButton {
@@ -75,6 +76,7 @@ br {
   z-index: 9999;
 }
 
+/* ***************** CALENDAR COLOR INFORMATION ***************** */
 .rbc-day-bg {
   background-color: #ffffff;
 }
@@ -83,4 +85,32 @@ br {
   background-color: rgb(214, 239, 255);
   outline: 2px solid #000000;
   outline-offset: -2px;
+}
+
+/* ***************** DROPDOWN COLOR SELECT ***************** */
+
+.red {
+  background-color: rgb(150, 22, 22);
+  color: black;
+}
+.green {
+  background-color: rgb(0, 129, 0);
+}
+.blue {
+  background-color: rgb(55, 55, 255);
+}
+.yellow {
+  background-color: rgb(255, 255, 0);
+}
+.orange {
+  background-color: rgb(255, 166, 0);
+}
+.purple {
+  background-color: rgb(132, 0, 132);
+}
+
+.colorDropdown {
+  position: relative;
+  left: 125px;
+  margin-right: 5px;
 }
