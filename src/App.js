@@ -39,6 +39,7 @@ function App() {
     hoursLeft: '',
     eventIndex: ''
   });
+
   const [allEvents, setAllEvents] = useState(events);
   const [modalEventIsOpen, setModalEventIsOpen] = useState(false);
   const [modalCreateEventIsOpen, setModalCreateEventIsOpen] = useState(false);
@@ -110,6 +111,16 @@ function App() {
     }
     setAllEvents([...allEvents, ...datesArray]);
     handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen); // Closes Modal
+    setNewEvent({
+      title: "",
+      jobName: "",
+      start: "",
+      end: "",
+      projectedHours: '',
+      perDay: '',
+      hoursLeft: '',
+      eventIndex: ''
+    })
   };
 
   const handleNameChange = (e) => {
@@ -302,8 +313,14 @@ function App() {
     setAllEvents(updatedEvents);
   }
 
+  const onSelectSlot = (e) => {
+    console.log(e)
+    setNewEvent({ ...newEvent, start: e.start, end: e.end })
+    handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen)
+  }
 
-  function onDragStart({event}) {}
+  function onDragStart({event}) {
+  }
 
   return (
     <div className="App">
@@ -414,20 +431,22 @@ function App() {
           </button>
         </div>
       </ReactModal>
-
-      <DnDCalendar
-        localizer={localizer}
-        events={allEvents}
-        startAccessor="start"
-        endAccessor="end"
-        onSelectEvent={handleEventClicked}
-        style={{ height: 800, margin: "50px", zIndex: 1 }}
-        selectable={true}
-        resizable={false}
-        draggableAccessor={(event) => true}
-        onEventDrop={onEventDrop}
-        onDragStart={onDragStart}
-      />
+      <div className="testing">
+        <DnDCalendar
+          localizer={localizer}
+          events={allEvents}
+          startAccessor="start"
+          endAccessor="end"
+          onSelectEvent={handleEventClicked}
+          style={{ height: 700, margin: "20px", zIndex: 1 }}
+          selectable={true}
+          resizable={false}
+          draggableAccessor={(event) => true}
+          onEventDrop={onEventDrop}
+          onDragStart={onDragStart}
+          onSelectSlot={onSelectSlot}
+        />
+      </div>
     </div>
   );
 }

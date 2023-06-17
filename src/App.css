@@ -74,3 +74,13 @@ br {
   background-color: rgba(25, 0, 255, 0.6);
   z-index: 9999;
 }
+
+.rbc-day-bg {
+  background-color: #ffffff;
+}
+
+.rbc-day-bg.rbc-today {
+  background-color: rgb(214, 239, 255);
+  outline: 2px solid #000000;
+  outline-offset: -2px;
+}
