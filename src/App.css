@@ -2,12 +2,33 @@
   text-align: center;
 }
 
+br {
+  margin: 1px 0;
+}
+
 .mainContainer {
-  background-color: aqua;
+  background-color: rgb(255, 255, 255);
+  position: relative;
 }
 
 .mainContainer input {
-  width: 15%;
+  width: 50%;
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  margin-top: 15px;
+}
+
+.mainContainer p {
+  display: inline-block;
+  margin-right: 10px;
+}
+.mainContainer .datePickerContainer {
+  display: inline-block;
+  width: 40%;
+  position: absolute;
+  right: 20%;
+  margin-top: -20px;
 }
 
 .mainLogo {
@@ -16,6 +37,12 @@
 }
 
 /* ***************** Buttons ***************** */
+.addEventButton {
+  display: block;
+  margin: auto;
+  margin-top: 10px;
+}
+
 .deleteButton {
   position: relative;
   left: 100px;
@@ -32,7 +59,7 @@
   background-color: rgb(255, 255, 255);
   border: solid 2px black;
   position: fixed;
-  top: 50%;
+  top: 40%;
   left: 40%;
   width: 350px;
   padding: 10px;
@@ -44,6 +71,6 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(25, 0, 255, 0.413);
+  background-color: rgba(25, 0, 255, 0.6);
   z-index: 9999;
 }

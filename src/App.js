@@ -40,7 +40,8 @@ function App() {
     eventIndex: ''
   });
   const [allEvents, setAllEvents] = useState(events);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalEventIsOpen, setModalEventIsOpen] = useState(false);
+  const [modalCreateEventIsOpen, setModalCreateEventIsOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState({});
 
   const [currentTitle, setCurrentTitle] = useState('');
@@ -49,9 +50,22 @@ function App() {
   const [newProjection, setNewProjection] = useState('');
   const [formattedDate, setFormattedDate] = useState("");
 
-  const handleModal = () => {
-    setModalIsOpen(!modalIsOpen);
+  const handleModal = (mySetModal, myModal) => {
+    mySetModal(!myModal);
   };
+
+  function showNewEventEditor() {
+    var mainContainer = document.querySelector('.mainContainer');
+    if (mainContainer.classList.contains('hidden')) {
+      mainContainer.classList.remove('hidden'); // Show the main container
+      mainContainer.classList.add('expanded'); // Expand the main container
+    } else {
+      mainContainer.classList.remove('expanded'); // Collapse the main container
+      setTimeout(function() {
+        mainContainer.classList.add('hidden'); // Hide the main container after the animation finishes
+      }, 300); // Wait for the animation to finish
+    }
+  }
 
   const handleEventClicked = (event) => {
     setCurrentTitle(event.jobName);
@@ -62,7 +76,7 @@ function App() {
       year: 'numeric'
     });
     setFormattedDate(currentDate)
-    handleModal();
+    handleModal(setModalEventIsOpen, modalEventIsOpen);
   };
 
   const handleAddEvent = () => {
@@ -95,6 +109,7 @@ function App() {
       }
     }
     setAllEvents([...allEvents, ...datesArray]);
+    handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen); // Closes Modal
   };
 
   const handleNameChange = (e) => {
@@ -109,7 +124,7 @@ function App() {
     }
 
     changeEventTitles(currentTitle, newTitle);
-    handleModal(); // Closes Modal
+    handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
     setNewTitle(''); // Resets the form
   };
 
@@ -118,7 +133,7 @@ function App() {
 
     let userInput = newPerDay  // Grab the user's input
     changeEventPerDayHours(selectedEvent.jobName, selectedEvent.eventIndex, userInput)
-    handleModal(); // Closes Modal
+    handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
     setNewPerDay(''); // Resets the form
   };
 
@@ -126,7 +141,7 @@ function App() {
     e.preventDefault();
 
     changeEventProjections(selectedEvent.jobName, newProjection)
-    handleModal(); // Closes Modal
+    handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
     setNewProjection(''); // Resets the form
   };
 
@@ -212,7 +227,7 @@ function App() {
     currentEvents.pop();
     const updatedEvents = [...filteredEvents, ...currentEvents];
     setAllEvents(updatedEvents);
-    // handleModal(); // Not sure I want this to close yet...
+    // handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
   }
 
   const handleAddDay = (event, jobName) => {
@@ -240,7 +255,7 @@ function App() {
     const updatedEvents = [...allEvents, newEvent];
     setAllEvents(updatedEvents);
 
-    // handleModal(); // Not sure I want this to close yet...
+    // handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
   }
 
 
@@ -292,8 +307,10 @@ function App() {
 
   return (
     <div className="App">
+      <img className="mainLogo" src={myImage} alt="Reliable Design Logo"/>
+      <button onClick={() => handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen)}>Create New Event</button>
 
-      <ReactModal overlayClassName="Overlay" className="modalBasic" isOpen={modalIsOpen} onRequestClose={() => setModalIsOpen(false)}>
+      <ReactModal overlayClassName="Overlay" className="modalBasic" isOpen={modalEventIsOpen} onRequestClose={() => setModalEventIsOpen(false)}>
         <button className="deleteButton" onClick={(e) => handleAddDay(e, selectedEvent.jobName)}>Add Day</button>
         <button className="deleteButton" onClick={(e) => handleRemoveDay(e, selectedEvent.jobName)}>Remove Day</button>
         <h2>{`${selectedEvent.jobName} - ${formattedDate}`}</h2>
@@ -335,52 +352,68 @@ function App() {
           <button type="submit">Submit</button>
         </form>
         </div>
-        <button className="closeModalButton" onClick={handleModal}>Close</button>
+        <button className="closeModalButton" onClick={() => handleModal(setModalEventIsOpen, modalEventIsOpen)}>Close</button>
       </ReactModal>
 
-      <img className="mainLogo" src={myImage} alt="Reliable Design Logo"/>
-      <button>Add New Event</button>
-      <div className="mainContainer">
-        <input
-          type="text"
-          placeholder="Add Title for Event"
-          className="titleInput"
-          value={newEvent.title}
-          onChange={(e) =>
-            setNewEvent({ ...newEvent, title: e.target.value })
-          }
-        />
-        <input
-          type="number"
-          placeholder="Enter Projected hours"
-          value={newEvent.projectedHours}
-          onChange={(e) =>
-            setNewEvent({ ...newEvent, projectedHours: e.target.value })
-          }
-        />
-        <input
-          type="number"
-          placeholder="Enter Daily Hours"
-          value={newEvent.perDay}
-          onChange={(e) =>
-            setNewEvent({ ...newEvent, perDay: e.target.value })
-          }
-        />
-        <DatePicker
-          placeholderText="Start Date"
-          selected={newEvent.start}
-          onChange={(start) => setNewEvent({ ...newEvent, start })}
-        />
-        <DatePicker
-          placeholderText="End Date"
-          selected={newEvent.end}
-          onChange={(end) => setNewEvent({ ...newEvent, end })}
-        />
-        <button style={{ marginTop: "10px" }} onClick={handleAddEvent}>
-          {" "}
-          Add Event{" "}
-        </button>
-      </div>
+      <ReactModal overlayClassName="Overlay" className="modalBasic" isOpen={modalCreateEventIsOpen} onRequestClose={() => setModalCreateEventIsOpen(false)}>
+        <div className="mainContainer">
+          <p>Event Title: </p>
+          <input
+            type="text"
+            placeholder="Add Title for Event"
+            className="titleInput"
+            value={newEvent.title}
+            onChange={(e) =>
+              setNewEvent({ ...newEvent, title: e.target.value })
+            }
+          />
+          <br></br>
+          <p>Projected Hours: </p>
+          <input
+            type="number"
+            placeholder="Enter Projected hours"
+            value={newEvent.projectedHours}
+            onChange={(e) =>
+              setNewEvent({ ...newEvent, projectedHours: e.target.value })
+            }
+          />
+          <br></br>
+          <p>PerDay Hour Rate: </p>
+          <input
+            type="number"
+            placeholder="Enter Daily Hours"
+            value={newEvent.perDay}
+            onChange={(e) =>
+              setNewEvent({ ...newEvent, perDay: e.target.value })
+            }
+          />
+          <br></br>
+          <p>Start Date: </p>
+          <div className="datePickerContainer">
+            <DatePicker
+              placeholderText="Start Date"
+              selected={newEvent.start}
+              onChange={(start) => setNewEvent({ ...newEvent, start })}
+            />
+
+          </div>
+          <br></br>
+          <p>End Date: </p>
+          <div className="datePickerContainer">
+            <DatePicker
+              placeholderText="End Date"
+              selected={newEvent.end}
+              onChange={(end) => setNewEvent({ ...newEvent, end })}
+            />
+
+          </div>
+          <br></br>
+          <button className="addEventButton" onClick={handleAddEvent}>
+            {" "}
+            Add Event{" "}
+          </button>
+        </div>
+      </ReactModal>
 
       <DnDCalendar
         localizer={localizer}
