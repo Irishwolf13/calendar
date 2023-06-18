@@ -228,7 +228,7 @@ function App() {
     currentEvents.pop();
     const updatedEvents = [...filteredEvents, ...currentEvents];
     setAllEvents(updatedEvents);
-    // handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
+    handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
   }
 
   const handleAddDay = (event, jobName) => {
@@ -256,7 +256,7 @@ function App() {
     const updatedEvents = [...allEvents, newEvent];
     setAllEvents(updatedEvents);
 
-    // handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
+    handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
   }
 
 
