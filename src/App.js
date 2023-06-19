@@ -6,6 +6,7 @@ import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
+import isWeekend from "date-fns/isWeekend";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
@@ -88,8 +89,7 @@ function App() {
     // Creates all the events
     let datesArray = [];
     for (let date = new Date(newEvent.start); date <= newEvent.end; date.setDate(date.getDate() + 1)) {
-      const dayOfWeek = date.getDay();              // get day of week (0 is Sunday, 6 is Saturday)
-      if (dayOfWeek !== 0 && dayOfWeek !== 6) {     // skip weekends
+      if (!isWeekend(date)) {     // skip weekends
         const title = `${newEvent.title} -- ${newEvent.perDay} / ${hoursLeft}`;
         datesArray.push({
           ...newEvent,
@@ -118,6 +118,10 @@ function App() {
       eventColor: 'blue'
     })
   };
+
+  const skipWeekend = () => {
+    
+  }
 
   const handleNameChange = (e) => {
     e.preventDefault();
