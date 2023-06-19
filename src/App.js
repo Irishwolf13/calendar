@@ -52,7 +52,7 @@ function App() {
   const [newTitle, setNewTitle] = useState("");
   const [newPerDay, setNewPerDay] = useState('');
   const [newProjection, setNewProjection] = useState('');
-  
+
   const [formattedDate, setFormattedDate] = useState("");
 
   useEffect(() => {
@@ -86,25 +86,9 @@ function App() {
       alert(`An event with job name "${jobName}" already exists`);
       return
     }
-    // Creates all the events
-    let datesArray = [];
-    for (let date = new Date(newEvent.start); date <= newEvent.end; date.setDate(date.getDate() + 1)) {
-      if (!isWeekend(date)) {     // skip weekends
-        const title = `${newEvent.title} -- ${newEvent.perDay} / ${hoursLeft}`;
-        datesArray.push({
-          ...newEvent,
-          title: title,
-          jobName: jobName,
-          start: new Date(date),
-          end: new Date(date),
-          initalHours: newEvent.projectedHours,
-          hoursLeft: hoursLeft,
-          eventIndex: datesArray.length
-        });
-        hoursLeft -= newEvent.perDay;
-      }
-    }
-    setAllEvents([...allEvents, ...datesArray]);
+    // let datesArray = calculateJobEvents(jobName, hoursLeft)
+    setAllEvents([...allEvents, ...calculateJobEvents(jobName, hoursLeft)]);
+    // fetch patch to the database
     handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen); // Closes Modal
     setNewEvent({
       title: "",
@@ -119,8 +103,29 @@ function App() {
     })
   };
 
-  const skipWeekend = () => {
-    
+  const calculateJobEvents = (jobName, hoursLeft) => {
+    // Creates Job Events
+
+    let myArray = [];
+    for (let date = new Date(newEvent.start); date <= newEvent.end; date.setDate(date.getDate() + 1)) {
+      const title = `${newEvent.title} -- ${newEvent.perDay} / ${hoursLeft}`;
+      myArray.push({
+        ...newEvent,
+        title: title,
+        jobName: jobName,
+        start: new Date(date),
+        end: new Date(date),
+        initalHours: newEvent.projectedHours,
+        hoursLeft: hoursLeft,
+        eventIndex: myArray.length
+      });
+      hoursLeft -= newEvent.perDay;
+    }
+    return myArray
+  }
+
+  const scheduleJob = () => {
+
   }
 
   const handleNameChange = (e) => {
