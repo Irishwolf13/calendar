@@ -9,7 +9,7 @@ import getDay from "date-fns/getDay";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // import Modal from "react-modal";
 import ReactModal from "react-modal";
 import myImage from './images/reliable_design_logo2.jpg';
@@ -39,7 +39,7 @@ function App() {
     perDay: "",
     hoursLeft: "",
     eventIndex: "",
-    eventColor: "green"
+    eventColor: "blue"
   });
 
   const [allEvents, setAllEvents] = useState(events);
@@ -51,7 +51,12 @@ function App() {
   const [newTitle, setNewTitle] = useState("");
   const [newPerDay, setNewPerDay] = useState('');
   const [newProjection, setNewProjection] = useState('');
+  
   const [formattedDate, setFormattedDate] = useState("");
+
+  useEffect(() => {
+    // Initial Fetch to get the array of objects for events
+  },[])
 
   const handleModal = (mySetModal, myModal) => {
     mySetModal(!myModal);
@@ -65,6 +70,7 @@ function App() {
       day: '2-digit',
       year: 'numeric'
     });
+    console.log(event.start);
     setFormattedDate(currentDate)
     handleModal(setModalEventIsOpen, modalEventIsOpen);
   };
@@ -109,7 +115,7 @@ function App() {
       perDay: '',
       hoursLeft: '',
       eventIndex: '',
-      eventColor: 'yellow'
+      eventColor: 'blue'
     })
   };
 
@@ -206,21 +212,21 @@ function App() {
     setAllEvents(updatedEvents);
   }
 
-  const changeEventDates = (titleToFind, newStartDate) => {
-    const updatedEvents = allEvents.map(event => {
-      if (event.jobName === titleToFind) {
-        return {
-          ...event,
-          start: newStartDate,
-          end: newStartDate
-        };
-      }
-      return event;
-    });
+  // const changeEventDates = (titleToFind, newStartDate) => {
+  //   const updatedEvents = allEvents.map(event => {
+  //     if (event.jobName === titleToFind) {
+  //       return {
+  //         ...event,
+  //         start: newStartDate,
+  //         end: newStartDate
+  //       };
+  //     }
+  //     return event;
+  //   });
 
-    // now you can update the original allEvents array with the updatedEvents array
-    setAllEvents(updatedEvents);
-  }
+  //   // now you can update the original allEvents array with the updatedEvents array
+  //   setAllEvents(updatedEvents);
+  // }
 
   const handleRemoveDay = (event, jobName) => {
     let currentEvents = allEvents.filter(event => event.jobName === jobName);
@@ -309,11 +315,13 @@ function App() {
 
   const onSelectSlot = (e) => {
     setNewEvent({ ...newEvent, start: e.start, end: e.end })
-    handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen)
+    if (modalEventIsOpen == false) {
+      handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen)
+    }
   }
 
-  function onDragStart({event}) {
-  }
+  // function onDragStart({event}) {
+  // }
 
   return (
     <div className="App">
@@ -446,7 +454,7 @@ function App() {
           resizable={false}
           draggableAccessor={(event) => true}
           onEventDrop={onEventDrop}
-          onDragStart={onDragStart}
+          // onDragStart={onDragStart}
           onSelectSlot={onSelectSlot}
           eventPropGetter={(event) =>
             event.eventColor
