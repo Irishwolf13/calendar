@@ -81,7 +81,13 @@ function App() {
     }
     scheduleJob(createJob(userInput))
     handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen); // Closes Modal
-    // setNewEvent({})
+    setNewEvent({
+      jobName: "",
+      start: "",
+      end: "",
+      projectedHours: "",
+      perDay: ""
+    })
   };
 
   const createJob = (userInput) => {
@@ -319,7 +325,11 @@ function App() {
   }
 
   const onSelectSlot = (e) => {
-    setNewEvent({ ...newEvent, start: e.start, end: e.end })
+    // The next two lines adjust for onSelectSlot always choosing the end date 1 day after it should... not sure why.
+    const newEndDate = new Date(e.end);
+    newEndDate.setDate(newEndDate.getDate() - 1);
+    setNewEvent({ ...newEvent, start: e.start, end: newEndDate });
+
     if (modalEventIsOpen == false) {
       handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen)
     }
