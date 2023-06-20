@@ -60,16 +60,17 @@ function App() {
   };
 
   const handleEventClicked = (event) => {
-    // setCurrentTitle(event.jobName);
-    // setSelectedEvent(event);
-    // let currentDate = event.start.toLocaleDateString('en-US', {
-    //   month: '2-digit',
-    //   day: '2-digit',
-    //   year: 'numeric'
-    // });
-    // console.log(event.start);
-    // setFormattedDate(currentDate)
-    // handleModal(setModalEventIsOpen, modalEventIsOpen);
+    console.log(event)
+    setCurrentTitle(event.jobName);
+    setSelectedEvent(event);
+    let currentDate = event.start.toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric'
+    });
+
+    setFormattedDate(currentDate)
+    handleModal(setModalEventIsOpen, modalEventIsOpen);
   };
 
   const handleAddEvent = (userInput) => {
@@ -90,6 +91,7 @@ function App() {
       end: userInput.end,
       projectedHours: userInput.projectedHours,
       perDay: userInput.perDay,
+      eventColor: userInput.eventColor,
       events: [{}]
     }
     return job
@@ -114,6 +116,8 @@ function App() {
         end: new Date(date),
         initalHours: myJob.projectedHours,
         hoursLeft: myJob.hoursLeft,
+        perDay: myJob.perDay,
+        eventColor: myJob.eventColor,
         eventIndex: myArray.length
       });
     }
@@ -122,95 +126,95 @@ function App() {
 
   const handleNameChange = (e) => {
     e.preventDefault();
-    // // Checks to make sure the job name isn't blank or in use
-    // if (newTitle === '') {
-    //   alert('Name change cannot be blank');
-    //   return
-    // } else if (allEvents.some(event => event.jobName === newTitle)) {
-    //   alert(`An event with title "${newTitle}" already exists.`);
-    //   return
-    // }
+    // Checks to make sure the job name isn't blank or in use
+    if (newTitle === '') {
+      alert('Name change cannot be blank');
+      return
+    } else if (allEvents.some(event => event.jobName === newTitle)) {
+      alert(`An event with title "${newTitle}" already exists.`);
+      return
+    }
 
-    // changeEventTitles(currentTitle, newTitle);
-    // handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
-    // setNewTitle(''); // Resets the form
+    changeEventTitles(currentTitle, newTitle);
+    handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
+    setNewTitle(''); // Resets the form
   };
 
   const handlePerDayChange = (e) => {
     e.preventDefault();
 
-    // let userInput = newPerDay  // Grab the user's input
-    // changeEventPerDayHours(selectedEvent.jobName, selectedEvent.eventIndex, userInput)
-    // handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
-    // setNewPerDay(''); // Resets the form
+    let userInput = newPerDay  // Grab the user's input
+    changeEventPerDayHours(selectedEvent.jobName, selectedEvent.eventIndex, userInput)
+    handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
+    setNewPerDay(''); // Resets the form
   };
 
   const handleProjectionChange = (e) => {
     e.preventDefault();
 
-    // changeEventProjections(selectedEvent.jobName, newProjection)
-    // handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
-    // setNewProjection(''); // Resets the form
+    changeEventProjections(selectedEvent.jobName, newProjection)
+    handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
+    setNewProjection(''); // Resets the form
   };
 
   const changeEventProjections = (titleToFind, userInput) => {
 
-    // const updatedEvents = allEvents.map(event => {
-    //   if (event.jobName === titleToFind) {
-    //     let hoursLeft = (userInput - (event.initalHours - event.hoursLeft))
-    //     return {
-    //       ...event,
-    //       title: `${event.jobName} -- ${event.perDay} / ${hoursLeft}`,
-    //       hoursLeft: hoursLeft,
-    //       initalHours: userInput
-    //     };
-    //   }
-    //   return event;
-    // });
-    // // update the original allEvents array with the updatedEvents array
-    // setAllEvents(updatedEvents);
+    const updatedEvents = allEvents.map(event => {
+      if (event.jobName === titleToFind) {
+        let hoursLeft = (userInput - (event.initalHours - event.hoursLeft))
+        return {
+          ...event,
+          title: `${event.jobName} -- ${event.perDay} / ${hoursLeft}`,
+          hoursLeft: hoursLeft,
+          initalHours: userInput
+        };
+      }
+      return event;
+    });
+    // update the original allEvents array with the updatedEvents array
+    setAllEvents(updatedEvents);
   }
 
   const changeEventPerDayHours = (titleToFind, myIndex, newPerDay) => {
-    // let newHoursLeft = 0;
-    // const updatedEvents = allEvents.map(event => {
-    //   if (event.jobName === titleToFind && myIndex === event.eventIndex) {
-    //     newHoursLeft = event.hoursLeft - (newPerDay - event.perDay)
-    //     return {
-    //       ...event,
-    //       perDay: newPerDay,
-    //       title: `${event.jobName} -- ${newPerDay} / ${newHoursLeft}`,
-    //       hoursLeft: newHoursLeft
-    //     };
-    //   }
-    //   if (event.jobName === titleToFind && myIndex <= event.eventIndex) {
-    //     newHoursLeft = (newHoursLeft - event.perDay)
-    //       return {
-    //         ...event,
-    //         title: `${event.jobName} -- ${event.perDay} / ${newHoursLeft}`,
-    //         hoursLeft: newHoursLeft
-    //       };
-    //   }
-    //   return event;
-    // });
-    // // update the original allEvents array with the updatedEvents array
-    // setAllEvents(updatedEvents);
+    let newHoursLeft = 0;
+    const updatedEvents = allEvents.map(event => {
+      if (event.jobName === titleToFind && myIndex === event.eventIndex) {
+        newHoursLeft = event.hoursLeft - (newPerDay - event.perDay)
+        return {
+          ...event,
+          perDay: newPerDay,
+          title: `${event.jobName} -- ${newPerDay} / ${newHoursLeft}`,
+          hoursLeft: newHoursLeft
+        };
+      }
+      if (event.jobName === titleToFind && myIndex <= event.eventIndex) {
+        newHoursLeft = (newHoursLeft - event.perDay)
+          return {
+            ...event,
+            title: `${event.jobName} -- ${event.perDay} / ${newHoursLeft}`,
+            hoursLeft: newHoursLeft
+          };
+      }
+      return event;
+    });
+    // update the original allEvents array with the updatedEvents array
+    setAllEvents(updatedEvents);
   }
 
   const changeEventTitles = (titleToFind, changeTitle) => {
-    // const updatedEvents = allEvents.map(event => {
-    //   if (event.jobName === titleToFind) {
-    //     return {
-    //       ...event,
-    //       jobName: changeTitle,
-    //       title: `${changeTitle} -- ${event.perDay} / ${event.hoursLeft}`
-    //     };
-    //   }
-    //   return event;
-    // });
+    const updatedEvents = allEvents.map(event => {
+      if (event.jobName === titleToFind) {
+        return {
+          ...event,
+          jobName: changeTitle,
+          title: `${changeTitle} -- ${event.perDay} / ${event.hoursLeft}`
+        };
+      }
+      return event;
+    });
 
-    // // now you can update the original allEvents array with the updatedEvents array
-    // setAllEvents(updatedEvents);
+    // now you can update the original allEvents array with the updatedEvents array
+    setAllEvents(updatedEvents);
   }
 
   // const changeEventDates = (titleToFind, newStartDate) => {
@@ -230,84 +234,84 @@ function App() {
   // }
 
   const handleRemoveDay = (event, jobName) => {
-    // let currentEvents = allEvents.filter(event => event.jobName === jobName);
-    // let filteredEvents = allEvents.filter((currentEvent) => currentEvent.jobName !== jobName);
-    // currentEvents.pop();
-    // const updatedEvents = [...filteredEvents, ...currentEvents];
-    // setAllEvents(updatedEvents);
-    // handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
+    let currentEvents = allEvents.filter(event => event.jobName === jobName);
+    let filteredEvents = allEvents.filter((currentEvent) => currentEvent.jobName !== jobName);
+    currentEvents.pop();
+    const updatedEvents = [...filteredEvents, ...currentEvents];
+    setAllEvents(updatedEvents);
+    handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
   }
 
   const handleAddDay = (event, jobName) => {
-    // const filteredEvents = allEvents.filter(event => event.jobName === jobName);
-    // const highestEvent = filteredEvents.reduce((highest, current) => {
-    //   if (current.eventIndex > highest.eventIndex) {
-    //     return current;
-    //   } else {
-    //     return highest;
-    //   }
-    // }, { eventIndex: -1 });
+    const filteredEvents = allEvents.filter(event => event.jobName === jobName);
+    const highestEvent = filteredEvents.reduce((highest, current) => {
+      if (current.eventIndex > highest.eventIndex) {
+        return current;
+      } else {
+        return highest;
+      }
+    }, { eventIndex: -1 });
 
-    // // Create a new Date object with highestEvent.start and add one day
-    // let newStartDate = new Date(highestEvent.start.getTime() + (24 * 60 * 60 * 1000));
+    // Create a new Date object with highestEvent.start and add one day
+    let newStartDate = new Date(highestEvent.start.getTime() + (24 * 60 * 60 * 1000));
 
-    // // Creates a copy of the previous last event, and adjusts the new info
-    // let newEvent = Object.assign({}, highestEvent);
-    // newEvent.eventIndex = highestEvent.eventIndex + 1
-    // newEvent.hoursLeft = highestEvent.hoursLeft - newEvent.perDay
-    // newEvent.start = newStartDate;
-    // newEvent.end = newStartDate;
-    // newEvent.title = `${newEvent.jobName} -- ${newEvent.perDay} / ${newEvent.hoursLeft}`;
+    // Creates a copy of the previous last event, and adjusts the new info
+    let newEvent = Object.assign({}, highestEvent);
+    newEvent.eventIndex = highestEvent.eventIndex + 1
+    newEvent.hoursLeft = highestEvent.hoursLeft - newEvent.perDay
+    newEvent.start = newStartDate;
+    newEvent.end = newStartDate;
+    newEvent.title = `${newEvent.jobName} -- ${newEvent.perDay} / ${newEvent.hoursLeft}`;
 
-    // // Update the state with the new array of events
-    // const updatedEvents = [...allEvents, newEvent];
-    // setAllEvents(updatedEvents);
+    // Update the state with the new array of events
+    const updatedEvents = [...allEvents, newEvent];
+    setAllEvents(updatedEvents);
 
-    // handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
+    handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
   }
 
 
   function onEventDrop({event, start, end, allDay}) {
-    // // Make sure events can't have a date earlier than their previous Index
-    // if(event.eventIndex > 0) {
-    //   const prevEvent = allEvents.find(e => e.jobName === event.jobName && e.eventIndex === event.eventIndex - 1);
-    //   if (start.getTime() <= prevEvent.start.getTime()) {
-    //     return
-    //   }
-    // }
+    // Make sure events can't have a date earlier than their previous Index
+    if(event.eventIndex > 0) {
+      const prevEvent = allEvents.find(e => e.jobName === event.jobName && e.eventIndex === event.eventIndex - 1);
+      if (start.getTime() <= prevEvent.start.getTime()) {
+        return
+      }
+    }
 
-    // // Difference between original event start date and new start date
-    // const differenceOfDates = start.getTime() - event.start.getTime();
+    // Difference between original event start date and new start date
+    const differenceOfDates = start.getTime() - event.start.getTime();
 
-    // // Declare updated events as an empty array to avoid a reference error
-    // let updatedEvents = [];
+    // Declare updated events as an empty array to avoid a reference error
+    let updatedEvents = [];
 
-    // // Map over all events and update the start and end dates based on the differenceOfDates
-    // updatedEvents = allEvents.map((currentEvent, index) => {
-    //   if(currentEvent.jobName === event.jobName && currentEvent.eventIndex >= event.eventIndex){
-    //     let adjustedStart = new Date(currentEvent.start.getTime() + differenceOfDates);
-    //     let adjustedEnd = new Date(currentEvent.end.getTime() + differenceOfDates);
+    // Map over all events and update the start and end dates based on the differenceOfDates
+    updatedEvents = allEvents.map((currentEvent, index) => {
+      if(currentEvent.jobName === event.jobName && currentEvent.eventIndex >= event.eventIndex){
+        let adjustedStart = new Date(currentEvent.start.getTime() + differenceOfDates);
+        let adjustedEnd = new Date(currentEvent.end.getTime() + differenceOfDates);
 
-    //     const previousEvent = updatedEvents[index - 1];
+        const previousEvent = updatedEvents[index - 1];
 
-    //     // Set start date to the day after previous event's end date
-    //     if(previousEvent){
-    //       adjustedStart.setDate(previousEvent.end.getDate() + 1);
-    //       adjustedEnd.setDate(previousEvent.end.getDate() + 1);
-    //     }
+        // Set start date to the day after previous event's end date
+        if(previousEvent){
+          adjustedStart.setDate(previousEvent.end.getDate() + 1);
+          adjustedEnd.setDate(previousEvent.end.getDate() + 1);
+        }
 
-    //     return {
-    //       ...currentEvent,
-    //       start: adjustedStart,
-    //       end: adjustedEnd
-    //     }
-    //   } else {
-    //     return {...currentEvent}
-    //   }
-    // });
+        return {
+          ...currentEvent,
+          start: adjustedStart,
+          end: adjustedEnd
+        }
+      } else {
+        return {...currentEvent}
+      }
+    });
 
-    // // Set the updated events using setAllEvents function
-    // setAllEvents(updatedEvents);
+    // Set the updated events using setAllEvents function
+    setAllEvents(updatedEvents);
   }
 
   const handleColorDropdownChange = (e) => {
