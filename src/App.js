@@ -60,7 +60,7 @@ function App() {
   };
 
   const handleEventClicked = (event) => {
-    console.log(event)
+    // console.log(event)
     setCurrentTitle(event.jobName);
     setSelectedEvent(event);
     let currentDate = event.start.toLocaleDateString('en-US', {
@@ -114,18 +114,20 @@ function App() {
     let myArray = [];
     myJob.hoursLeft = myJob.projectedHours
     for (let date = new Date(myJob.start); date <= myJob.end; date.setDate(date.getDate() + 1)) {
-      myJob.hoursLeft -= myJob.perDay;
-      myArray.push({
-        title: `${myJob.jobName} -- ${myJob.perDay} / ${myJob.hoursLeft}`,
-        jobName: myJob.jobName,
-        start: new Date(date),
-        end: new Date(date),
-        initalHours: myJob.projectedHours,
-        hoursLeft: myJob.hoursLeft,
-        perDay: myJob.perDay,
-        eventColor: myJob.eventColor,
-        eventIndex: myArray.length
-      });
+      if(!isWeekend(date)) {
+        myJob.hoursLeft -= myJob.perDay;
+        myArray.push({
+          title: `${myJob.jobName} -- ${myJob.perDay} / ${myJob.hoursLeft}`,
+          jobName: myJob.jobName,
+          start: new Date(date),
+          end: new Date(date),
+          initalHours: myJob.projectedHours,
+          hoursLeft: myJob.hoursLeft,
+          perDay: myJob.perDay,
+          eventColor: myJob.eventColor,
+          eventIndex: myArray.length
+        });
+      }
     }
     return myArray
   }
