@@ -91,6 +91,7 @@ function App() {
   };
 
   const createJob = (userInput) => {
+    console.log(userInput)
     let job = {
       jobName: userInput.jobName,
       start: userInput.start,
@@ -100,6 +101,7 @@ function App() {
       eventColor: userInput.eventColor,
       events: [{}]
     }
+    console.log(job)
     return job
   }
 
@@ -247,7 +249,9 @@ function App() {
     currentEvents.pop();
     const updatedEvents = [...filteredEvents, ...currentEvents];
     setAllEvents(updatedEvents);
-    handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
+    if(currentEvents.length === 0) {
+      handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
+    }
   }
 
   const handleAddDay = (event, jobName) => {
@@ -275,7 +279,7 @@ function App() {
     const updatedEvents = [...allEvents, newEvent];
     setAllEvents(updatedEvents);
 
-    handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
+    // handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
   }
 
 
@@ -293,7 +297,6 @@ function App() {
 
     // Declare updated events as an empty array to avoid a reference error
     let updatedEvents = [];
-
     // Map over all events and update the start and end dates based on the differenceOfDates
     updatedEvents = allEvents.map((currentEvent, index) => {
       if(currentEvent.jobName === event.jobName && currentEvent.eventIndex >= event.eventIndex){
@@ -329,6 +332,8 @@ function App() {
   const onSelectSlot = (e) => {
     // The next two lines adjust for onSelectSlot always choosing the end date 1 day after it should... not sure why.
     const newEndDate = new Date(e.end);
+    console.log("e.End: ",e.end)
+    console.log("newEndDate: ",newEndDate)
     newEndDate.setDate(newEndDate.getDate() - 1);
     setNewEvent({ ...newEvent, start: e.start, end: newEndDate });
 
