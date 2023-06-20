@@ -10,7 +10,7 @@ import isWeekend from "date-fns/isWeekend";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 // import Modal from "react-modal";
 import ReactModal from "react-modal";
 import myImage from './images/reliable_design_logo2.jpg';
@@ -51,16 +51,12 @@ function App() {
 
   const [formattedDate, setFormattedDate] = useState("");
 
-  // useEffect(() => {
-  //   // Initial Fetch to get the array of objects for events
-  // },[])
-
   const handleModal = (mySetModal, myModal) => {
+    console.log('Opening modal');
     mySetModal(!myModal);
   };
 
   const handleEventClicked = (event) => {
-    // console.log(event)
     setCurrentTitle(event.jobName);
     setSelectedEvent(event);
     let currentDate = event.start.toLocaleDateString('en-US', {
@@ -91,7 +87,6 @@ function App() {
   };
 
   const createJob = (userInput) => {
-    console.log(userInput)
     let job = {
       jobName: userInput.jobName,
       start: userInput.start,
@@ -101,7 +96,6 @@ function App() {
       eventColor: userInput.eventColor,
       events: [{}]
     }
-    console.log(job)
     return job
   }
 
@@ -117,7 +111,6 @@ function App() {
     myJob.hoursLeft = myJob.projectedHours
     for (let date = new Date(myJob.start); date <= myJob.end; date.setDate(date.getDate() + 1)) {
       if(!isWeekend(date)) {
-        myJob.hoursLeft -= myJob.perDay;
         myArray.push({
           title: `${myJob.jobName} -- ${myJob.perDay} / ${myJob.hoursLeft}`,
           jobName: myJob.jobName,
@@ -129,6 +122,7 @@ function App() {
           eventColor: myJob.eventColor,
           eventIndex: myArray.length
         });
+        myJob.hoursLeft -= myJob.perDay;
       }
     }
     return myArray
@@ -186,24 +180,44 @@ function App() {
   }
 
   const changeEventPerDayHours = (titleToFind, myIndex, newPerDay) => {
-    let newHoursLeft = 0;
+    let previousPerDay = 0;
+    let previousHoursLeft = 0;
     const updatedEvents = allEvents.map(event => {
-      if (event.jobName === titleToFind && myIndex === event.eventIndex) {
-        newHoursLeft = event.hoursLeft - (newPerDay - event.perDay)
-        return {
-          ...event,
-          perDay: newPerDay,
-          title: `${event.jobName} -- ${newPerDay} / ${newHoursLeft}`,
-          hoursLeft: newHoursLeft
-        };
-      }
-      if (event.jobName === titleToFind && myIndex <= event.eventIndex) {
-        newHoursLeft = (newHoursLeft - event.perDay)
+      if(event.jobName === titleToFind){
+        if (myIndex === 0 && myIndex === event.eventIndex) {
+          previousPerDay = newPerDay
+          previousHoursLeft = event.hoursLeft;
           return {
             ...event,
-            title: `${event.jobName} -- ${event.perDay} / ${newHoursLeft}`,
-            hoursLeft: newHoursLeft
+            title: `${event.jobName} -- ${newPerDay} / ${event.hoursLeft}`,
+            perDay: newPerDay
           };
+        }
+        if (myIndex === event.eventIndex) {
+            let frank = previousHoursLeft - previousPerDay
+            previousPerDay = newPerDay;
+            previousHoursLeft = frank
+            return {
+              ...event,
+              title: `${event.jobName} -- ${newPerDay} / ${frank}`,
+              perDay: newPerDay
+            };
+        }
+        if (myIndex > event.eventIndex) {
+          previousPerDay = event.perDay;
+          previousHoursLeft = event.hoursLeft
+          return {...event}
+        }
+        if (myIndex < event.eventIndex) {
+            let frank = previousHoursLeft - previousPerDay
+            previousPerDay = event.perDay;
+            previousHoursLeft = frank
+            return {
+              ...event,
+              title: `${event.jobName} -- ${event.perDay} / ${frank}`
+            };
+        }
+
       }
       return event;
     });
@@ -332,8 +346,6 @@ function App() {
   const onSelectSlot = (e) => {
     // The next two lines adjust for onSelectSlot always choosing the end date 1 day after it should... not sure why.
     const newEndDate = new Date(e.end);
-    console.log("e.End: ",e.end)
-    console.log("newEndDate: ",newEndDate)
     newEndDate.setDate(newEndDate.getDate() - 1);
     setNewEvent({ ...newEvent, start: e.start, end: newEndDate });
 
