@@ -399,6 +399,7 @@ function App() {
               placeholder={selectedEvent.perDay}
               value={newPerDay}
               onChange={(e) => setNewPerDay(e.target.value)}
+              autoFocus
             />
           </label>
           <button type="submit">Submit</button>
