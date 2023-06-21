@@ -75,7 +75,8 @@ function App() {
       alert(`An event with job name "${userInput.jobName}" already exists`);
       return
     }
-    scheduleJob(createJob(userInput))
+    let jobToSchedule = createJob(userInput)
+    scheduleJob(jobToSchedule)
     handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen); // Closes Modal
     setNewEvent({
       jobName: "",
@@ -96,6 +97,7 @@ function App() {
       eventColor: userInput.eventColor,
       events: [{}]
     }
+    // I believe here is where we would want to post to the backend
     return job
   }
 
@@ -108,24 +110,32 @@ function App() {
 
   const calculateJobEvents = (myJob) => {
     let myArray = [];
-    myJob.hoursLeft = myJob.projectedHours
-    for (let date = new Date(myJob.start); date <= myJob.end; date.setDate(date.getDate() + 1)) {
-      if(!isWeekend(date)) {
-        myArray.push({
-          title: `${myJob.jobName} -- ${myJob.perDay} / ${myJob.hoursLeft}`,
-          jobName: myJob.jobName,
-          start: new Date(date),
-          end: new Date(date),
-          initalHours: myJob.projectedHours,
-          hoursLeft: myJob.hoursLeft,
-          perDay: myJob.perDay,
-          eventColor: myJob.eventColor,
-          eventIndex: myArray.length
-        });
+    let frank = myJob.projectedHours;
+    myJob.hoursLeft = myJob.projectedHours;
+    console.log("Start: ",myJob.start);
+    let myCurrentDate = myJob.start;
+    let isFirstIteration = true;
+    while (frank > 0) {
+      frank -= myJob.perDay;
+      if (!isFirstIteration) {
+        myCurrentDate.setDate(myCurrentDate.getDate() + 1);
         myJob.hoursLeft -= myJob.perDay;
       }
+      isFirstIteration = false;
+      myArray.push({
+        title: `${myJob.jobName} -- ${myJob.perDay} / ${myJob.hoursLeft}`,
+        jobName: myJob.jobName,
+        start: new Date(myCurrentDate),
+        end: new Date(myCurrentDate),
+        initalHours: myJob.projectedHours,
+        hoursLeft: frank,
+        perDay: myJob.perDay,
+        eventColor: myJob.eventColor,
+        eventIndex: myArray.length
+      });
     }
-    return myArray
+    console.log("myArray: ",myArray);
+    return myArray;
   }
 
   const handleNameChange = (e) => {
@@ -339,7 +349,7 @@ function App() {
 
           newCurrentEvent = currentEvent;
         }
-        adjustForWeekend(newCurrentEvent, currentEvent)
+        adjustForWeekend(currentEvent)
       }
       return {...currentEvent}
     });
@@ -348,14 +358,13 @@ function App() {
     setAllEvents(updatedEvents);
   }
 
-  const adjustForWeekend = (newCurrentEvent, currentEvent) => {
-    while(isWeekend(currentEvent.start)) {
-      const adjustedStart = new Date(currentEvent.start.getTime() + 86400000);
-      const adjustedEnd = new Date(currentEvent.start.getTime() + 86400000);
+  const adjustForWeekend = (myEvent) => {
+    while(isWeekend(myEvent.start)) {
+      const adjustedStart = new Date(myEvent.start.getTime() + 86400000);
+      const adjustedEnd = new Date(myEvent.start.getTime() + 86400000);
       // Set the updated start and end times
-      currentEvent.start = adjustedStart;
-      currentEvent.end = adjustedEnd;
-      // newCurrentEvent = currentEvent;
+      myEvent.start = adjustedStart;
+      myEvent.end = adjustedEnd;
     }
   }
 
