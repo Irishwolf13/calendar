@@ -109,32 +109,42 @@ function App() {
   }
 
   const calculateJobEvents = (myJob) => {
-    let myArray = [];
-    let frank = myJob.projectedHours;
     myJob.hoursLeft = myJob.projectedHours;
-    console.log("Start: ",myJob.start);
+    let myArray = [];
+    let myHoursLeft = myJob.projectedHours;
     let myCurrentDate = myJob.start;
     let isFirstIteration = true;
-    while (frank > 0) {
-      frank -= myJob.perDay;
+
+    while (myHoursLeft >= (0 - myHoursLeft)) {
+      myHoursLeft -= myJob.perDay;
       if (!isFirstIteration) {
         myCurrentDate.setDate(myCurrentDate.getDate() + 1);
         myJob.hoursLeft -= myJob.perDay;
       }
       isFirstIteration = false;
-      myArray.push({
-        title: `${myJob.jobName} -- ${myJob.perDay} / ${myJob.hoursLeft}`,
-        jobName: myJob.jobName,
-        start: new Date(myCurrentDate),
-        end: new Date(myCurrentDate),
-        initalHours: myJob.projectedHours,
-        hoursLeft: frank,
-        perDay: myJob.perDay,
-        eventColor: myJob.eventColor,
-        eventIndex: myArray.length
-      });
+
+      if(isWeekend(myCurrentDate)) {
+      myCurrentDate.setDate(myCurrentDate.getDate() + 2);
+      }
+
+      if(myHoursLeft < 0) {
+        myJob.perDay = parseInt(myJob.perDay) + myHoursLeft
+      }
+
+      if(myJob.perDay !== 0) {
+        myArray.push({
+          title: `${myJob.jobName} -- ${myJob.perDay} / ${myJob.hoursLeft}`,
+          jobName: myJob.jobName,
+          start: new Date(myCurrentDate),
+          end: new Date(myCurrentDate),
+          initalHours: myJob.projectedHours,
+          hoursLeft: myHoursLeft,
+          perDay: myJob.perDay,
+          eventColor: myJob.eventColor,
+          eventIndex: myArray.length
+        });
+      }
     }
-    console.log("myArray: ",myArray);
     return myArray;
   }
 
