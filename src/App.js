@@ -329,7 +329,6 @@ function App() {
         }
       }
       if(currentEvent.jobName === event.jobName && currentEvent.eventIndex > event.eventIndex) {
-        console.log("Previous Event: ",newCurrentEvent)
         if (newCurrentEvent) {
           const adjustedStart = new Date(newCurrentEvent.start.getTime() + 86400000);
           const adjustedEnd = new Date(newCurrentEvent.start.getTime() + 86400000);
@@ -340,12 +339,24 @@ function App() {
 
           newCurrentEvent = currentEvent;
         }
+        adjustForWeekend(newCurrentEvent, currentEvent)
       }
       return {...currentEvent}
     });
 
     // Set the updated events using setAllEvents function
     setAllEvents(updatedEvents);
+  }
+
+  const adjustForWeekend = (newCurrentEvent, currentEvent) => {
+    while(isWeekend(currentEvent.start)) {
+      const adjustedStart = new Date(currentEvent.start.getTime() + 86400000);
+      const adjustedEnd = new Date(currentEvent.start.getTime() + 86400000);
+      // Set the updated start and end times
+      currentEvent.start = adjustedStart;
+      currentEvent.end = adjustedEnd;
+      // newCurrentEvent = currentEvent;
+    }
   }
 
   const handleColorDropdownChange = (e) => {
