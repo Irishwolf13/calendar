@@ -297,7 +297,7 @@ function App() {
   }
 
 
-  function onEventDrop({event, start, end, allDay}) {
+  function onEventDrop({event, start, end}) {
     // Make sure events can't have a date earlier than their previous Index
     if(event.eventIndex > 0) {
       const prevEvent = allEvents.find(e => e.jobName === event.jobName && e.eventIndex === event.eventIndex - 1);
@@ -305,34 +305,43 @@ function App() {
         return
       }
     }
-
     // Difference between original event start date and new start date
     const differenceOfDates = start.getTime() - event.start.getTime();
 
     // Declare updated events as an empty array to avoid a reference error
     let updatedEvents = [];
     // Map over all events and update the start and end dates based on the differenceOfDates
+    // console.log(start)
+    let newCurrentEvent = '';
     updatedEvents = allEvents.map((currentEvent, index) => {
-      if(currentEvent.jobName === event.jobName && currentEvent.eventIndex >= event.eventIndex){
+      if(currentEvent.jobName === event.jobName && currentEvent.eventIndex === event.eventIndex){
         let adjustedStart = new Date(currentEvent.start.getTime() + differenceOfDates);
         let adjustedEnd = new Date(currentEvent.end.getTime() + differenceOfDates);
-
-        const previousEvent = updatedEvents[index - 1];
-
-        // Set start date to the day after previous event's end date
-        if(previousEvent){
-          adjustedStart.setDate(previousEvent.end.getDate() + 1);
-          adjustedEnd.setDate(previousEvent.end.getDate() + 1);
+        newCurrentEvent = {
+          ...currentEvent,
+          start: adjustedStart,
+          end: adjustedEnd
         }
-
         return {
           ...currentEvent,
           start: adjustedStart,
           end: adjustedEnd
         }
-      } else {
-        return {...currentEvent}
       }
+      if(currentEvent.jobName === event.jobName && currentEvent.eventIndex > event.eventIndex) {
+        console.log("Previous Event: ",newCurrentEvent)
+        if (newCurrentEvent) {
+          const adjustedStart = new Date(newCurrentEvent.start.getTime() + 86400000);
+          const adjustedEnd = new Date(newCurrentEvent.start.getTime() + 86400000);
+
+          // Set the updated start and end times
+          currentEvent.start = adjustedStart;
+          currentEvent.end = adjustedEnd;
+
+          newCurrentEvent = currentEvent;
+        }
+      }
+      return {...currentEvent}
     });
 
     // Set the updated events using setAllEvents function
