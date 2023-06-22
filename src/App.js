@@ -58,6 +58,7 @@ function App() {
 
   const handleEventClicked = (event) => {
     setCurrentTitle(event.jobName);
+    console.log(event)
     setSelectedEvent(event);
     let currentDate = event.start.toLocaleDateString('en-US', {
       month: '2-digit',
@@ -168,6 +169,8 @@ function App() {
     e.preventDefault();
 
     let userInput = newPerDay  // Grab the user's input
+    console.log("Selected Event: ", selectedEvent)
+    console.log("UserInput: ",userInput)
     changeEventPerDayHours(selectedEvent.jobName, selectedEvent.eventIndex, userInput)
     handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
     setNewPerDay(''); // Resets the form
@@ -200,47 +203,61 @@ function App() {
   }
 
   const changeEventPerDayHours = (titleToFind, myIndex, newPerDay) => {
+    newPerDay = parseInt(newPerDay)
     let previousPerDay = 0;
-    let previousHoursLeft = 0;
+    let hoursRemaining = 0;
+    let tempHours = 0;
     const updatedEvents = allEvents.map(event => {
       if(event.jobName === titleToFind){
         if (myIndex === 0 && myIndex === event.eventIndex) {
-          previousPerDay = newPerDay
-          previousHoursLeft = event.hoursLeft;
+          hoursRemaining = parseInt(event.initalHours);
+          previousPerDay = parseInt(newPerDay)
           return {
             ...event,
-            title: `${event.jobName} -- ${newPerDay} / ${event.hoursLeft}`,
-            perDay: newPerDay
+            title: `${event.jobName} -- ${newPerDay} / ${parseInt(event.initalHours)}`,
+            perDay: parseInt(newPerDay),
+            hoursLeft: (parseInt(event.hoursLeft) + (parseInt(event.perDay) - parseInt(newPerDay)))
           };
         }
-        if (myIndex === event.eventIndex) {
-            let frank = previousHoursLeft - previousPerDay
-            previousPerDay = newPerDay;
-            previousHoursLeft = frank
-            return {
-              ...event,
-              title: `${event.jobName} -- ${newPerDay} / ${frank}`,
-              perDay: newPerDay
-            };
-        }
         if (myIndex > event.eventIndex) {
-          previousPerDay = event.perDay;
-          previousHoursLeft = event.hoursLeft
+          hoursRemaining = parseInt(event.hoursLeft) //30
+          previousPerDay = parseInt(event.perDay); //10
           return {...event}
         }
-        if (myIndex < event.eventIndex) {
-            let frank = previousHoursLeft - previousPerDay
-            previousPerDay = event.perDay;
-            previousHoursLeft = frank
-            return {
-              ...event,
-              title: `${event.jobName} -- ${event.perDay} / ${frank}`
-            };
+        if (myIndex === event.eventIndex) {
+          hoursRemaining = parseInt(hoursRemaining);
+          previousPerDay = parseInt(newPerDay)
+          console.log('target')
+          console.log(typeof(newPerDay))
+          console.log(typeof(previousPerDay))
+          console.log(typeof(hoursRemaining))
+          let frank = (parseInt(event.hoursLeft) + (parseInt(event.perDay) - parseInt(newPerDay)))
+          console.log('', event.hours)
+          console.log('frank: ', frank)
+          return {
+            ...event,
+            title: `${event.jobName} -- ${newPerDay} / ${hoursRemaining}`,
+            perDay: parseInt(newPerDay),
+            hoursLeft: (parseInt(event.hoursLeft) + (parseInt(event.perDay) - parseInt(newPerDay)))
+          };
         }
-
+        if (myIndex < event.eventIndex) {
+          hoursRemaining = parseInt(hoursRemaining) - parseInt(previousPerDay)
+          previousPerDay = parseInt(event.perDay);
+          
+          console.log("After")
+          console.log(typeof(hoursRemaining))
+          console.log(typeof(previousPerDay))
+          return {
+            ...event,
+            title: `${event.jobName} -- ${event.perDay} / ${hoursRemaining}`,
+            hoursLeft: (parseInt(event.hoursLeft) + (parseInt(event.perDay) - parseInt(newPerDay)))
+          };
+        }
       }
       return event;
     });
+    // console.log(updatedEvents)
     // update the original allEvents array with the updatedEvents array
     setAllEvents(updatedEvents);
   }
