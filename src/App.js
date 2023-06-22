@@ -73,9 +73,8 @@ function App() {
   const handleAddEvent = (e, userInput) => {
     e.preventDefault()
     if(userInput.jobName === '' ) {
-      alert('You must have an Event Title')
-      return
-    }
+      alert('You must have an Event Title') 
+      return}
 
     if(userInput.projectedHours === '' ) {
       alert('You must have Projected Hours')
@@ -522,13 +521,15 @@ function App() {
           </div> */}
             <br></br>
             <select className="colorDropdown" onChange={handleColorDropdownChange}>
-              <option value="blue">Default Color</option>
-              <option value="red">Red</option>
-              <option value="green">Green</option>
-              <option value="blue">Blue</option>
-              <option value="yellow">Yellow</option>
-              <option value="orange">Orange</option>
-              <option value="purple">Purple</option>
+              <option value="rgb(55, 55, 255)">Default Color</option>
+              <option value="rgb(55, 55, 255)">Blue</option>
+              <option value="rgb(172, 236, 253)">Light Blue</option>
+              <option value="rgb(0, 129, 0)">Green</option>
+              <option value="rgb(132, 0, 132)">Purple</option>
+              <option value="rgb(255, 63, 172)">Pink</option>
+              <option value="rgb(255, 0, 0)">Red</option>
+              <option value="rgb(255, 255, 0)">Yellow</option>
+              <option value="rgb(255, 166, 0)">Orange</option>
             </select>
             <br></br>
             <button type="submit" className="addEventButton" onClick={(e) => handleAddEvent(e, newEvent)}>
@@ -557,7 +558,7 @@ function App() {
               ? {
                   style: {
                     background: event.eventColor,
-                    color: event.eventColor === 'red' || event.eventColor === 'yellow' || event.eventColor === 'orange' ? 'black' : ''
+                    color: event.eventColor === 'rgb(172, 236, 253)' || event.eventColor === 'rgb(255, 255, 0)' || event.eventColor === 'orange' ? 'black' : ''
                   }
                 }
               : {}
