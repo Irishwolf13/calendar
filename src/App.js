@@ -98,7 +98,9 @@ function App() {
       eventColor: userInput.eventColor,
       events: [{}]
     }
+    // **********************************************************************************************************
     // I believe here is where we would want to post to the backend
+    // **********************************************************************************************************
     return job
   }
 
@@ -220,20 +222,14 @@ function App() {
           };
         }
         if (myIndex > event.eventIndex) {
-          hoursRemaining = parseInt(event.hoursLeft) //30
-          previousPerDay = parseInt(event.perDay); //10
+          hoursRemaining = parseInt(event.hoursLeft)
+          previousPerDay = parseInt(event.perDay);
           return {...event}
         }
         if (myIndex === event.eventIndex) {
           hoursRemaining = parseInt(hoursRemaining);
           previousPerDay = parseInt(newPerDay)
-          console.log('target')
-          console.log(typeof(newPerDay))
-          console.log(typeof(previousPerDay))
-          console.log(typeof(hoursRemaining))
-          let frank = (parseInt(event.hoursLeft) + (parseInt(event.perDay) - parseInt(newPerDay)))
-          console.log('', event.hours)
-          console.log('frank: ', frank)
+          // let frank = (parseInt(event.hoursLeft) + (parseInt(event.perDay) - parseInt(newPerDay)))
           return {
             ...event,
             title: `${event.jobName} -- ${newPerDay} / ${hoursRemaining}`,
@@ -244,10 +240,6 @@ function App() {
         if (myIndex < event.eventIndex) {
           hoursRemaining = parseInt(hoursRemaining) - parseInt(previousPerDay)
           previousPerDay = parseInt(event.perDay);
-          
-          console.log("After")
-          console.log(typeof(hoursRemaining))
-          console.log(typeof(previousPerDay))
           return {
             ...event,
             title: `${event.jobName} -- ${event.perDay} / ${hoursRemaining}`,
@@ -257,7 +249,6 @@ function App() {
       }
       return event;
     });
-    // console.log(updatedEvents)
     // update the original allEvents array with the updatedEvents array
     setAllEvents(updatedEvents);
   }
