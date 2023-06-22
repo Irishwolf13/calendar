@@ -307,15 +307,15 @@ function App() {
     }, { eventIndex: -1 });
 
     // Create a new Date object with highestEvent.start and add one day
-    let newStartDate = new Date(highestEvent.start.getTime() + (24 * 60 * 60 * 1000));
+    let newStartDate = new Date(highestEvent.start.getTime() + (86400000));
 
     // Creates a copy of the previous last event, and adjusts the new info
     let newEvent = Object.assign({}, highestEvent);
     newEvent.eventIndex = highestEvent.eventIndex + 1
+    newEvent.title = `${newEvent.jobName} -- ${newEvent.perDay} / ${newEvent.hoursLeft}`;
     newEvent.hoursLeft = highestEvent.hoursLeft - newEvent.perDay
     newEvent.start = newStartDate;
     newEvent.end = newStartDate;
-    newEvent.title = `${newEvent.jobName} -- ${newEvent.perDay} / ${newEvent.hoursLeft}`;
 
     // Update the state with the new array of events
     const updatedEvents = [...allEvents, newEvent];
