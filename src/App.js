@@ -28,7 +28,9 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
-const events = [];
+const events = [
+
+];
 
 function App() {
   const [newEvent, setNewEvent] = useState({
@@ -40,9 +42,10 @@ function App() {
   });
 
   const [allEvents, setAllEvents] = useState(events);
+  const [selectedEvent, setSelectedEvent] = useState({});
+
   const [modalEventIsOpen, setModalEventIsOpen] = useState(false);
   const [modalCreateEventIsOpen, setModalCreateEventIsOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState({});
 
   const [currentTitle, setCurrentTitle] = useState('');
   const [newTitle, setNewTitle] = useState("");
@@ -52,13 +55,11 @@ function App() {
   const [formattedDate, setFormattedDate] = useState("");
 
   const handleModal = (mySetModal, myModal) => {
-    console.log('Opening modal');
     mySetModal(!myModal);
   };
-
   const handleEventClicked = (event) => {
     setCurrentTitle(event.jobName);
-    console.log(event)
+    console.log("Clicked Event: ", allEvents)
     setSelectedEvent(event);
     let currentDate = event.start.toLocaleDateString('en-US', {
       month: '2-digit',
@@ -76,11 +77,11 @@ function App() {
       alert('You must have an Event Title') 
       return}
 
-    if(userInput.projectedHours === '' ) {
+    if(userInput.projectedHours === '' || userInput.projectedHours === "0") {
       alert('You must have Projected Hours')
       return
     }
-    if(userInput.perDay === "") {
+    if(userInput.perDay === "" || userInput.perDay === "0") {
       alert('You must have a Per Day Rate')
       return
     }
@@ -184,8 +185,6 @@ function App() {
     e.preventDefault();
 
     let userInput = newPerDay  // Grab the user's input
-    console.log("Selected Event: ", selectedEvent)
-    console.log("UserInput: ",userInput)
     changeEventPerDayHours(selectedEvent.jobName, selectedEvent.eventIndex, userInput)
     handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
     setNewPerDay(''); // Resets the form
@@ -200,13 +199,24 @@ function App() {
   };
 
   const changeEventProjections = (titleToFind, userInput) => {
-
+    // We need these two variables for the first iteration
+    let titleHours = null
+    let titleRemaining = null
     const updatedEvents = allEvents.map(event => {
       if (event.jobName === titleToFind) {
+        if(titleHours === null) {
+          titleHours = userInput
+          // This sets up the next iteration
+          titleRemaining = event.perDay
+        } else {
+          titleHours = titleHours - titleRemaining
+          // This sets up the next iteration
+          titleRemaining = event.perDay
+        }
         let hoursLeft = (userInput - (event.initalHours - event.hoursLeft))
         return {
           ...event,
-          title: `${event.jobName} -- ${event.perDay} / ${hoursLeft}`,
+          title: `${event.jobName} -- ${event.perDay} / ${titleHours}`,
           hoursLeft: hoursLeft,
           initalHours: userInput
         };
@@ -282,22 +292,6 @@ function App() {
     setAllEvents(updatedEvents);
   }
 
-  // const changeEventDates = (titleToFind, newStartDate) => {
-  //   const updatedEvents = allEvents.map(event => {
-  //     if (event.jobName === titleToFind) {
-  //       return {
-  //         ...event,
-  //         start: newStartDate,
-  //         end: newStartDate
-  //       };
-  //     }
-  //     return event;
-  //   });
-
-  //   // now you can update the original allEvents array with the updatedEvents array
-  //   setAllEvents(updatedEvents);
-  // }
-
   const handleRemoveDay = (event, jobName) => {
     let currentEvents = allEvents.filter(event => event.jobName === jobName);
     let filteredEvents = allEvents.filter((currentEvent) => currentEvent.jobName !== jobName);
@@ -321,6 +315,12 @@ function App() {
 
     // Create a new Date object with highestEvent.start and add one day
     let newStartDate = new Date(highestEvent.start.getTime() + (86400000));
+
+    // This will make it skip the weekend dates
+    while(isWeekend(newStartDate)) {
+      newStartDate = new Date(newStartDate.getTime() + (86400000))
+    }
+
 
     // Creates a copy of the previous last event, and adjusts the new info
     let newEvent = Object.assign({}, highestEvent);
@@ -352,7 +352,6 @@ function App() {
     // Declare updated events as an empty array to avoid a reference error
     let updatedEvents = [];
     // Map over all events and update the start and end dates based on the differenceOfDates
-    // console.log(start)
     let newCurrentEvent = '';
     updatedEvents = allEvents.map((currentEvent, index) => {
       if(currentEvent.jobName === event.jobName && currentEvent.eventIndex === event.eventIndex){
@@ -385,7 +384,6 @@ function App() {
       return {...currentEvent}
     });
 
-    // Set the updated events using setAllEvents function
     setAllEvents(updatedEvents);
   }
 
