@@ -70,7 +70,21 @@ function App() {
     handleModal(setModalEventIsOpen, modalEventIsOpen);
   };
 
-  const handleAddEvent = (userInput) => {
+  const handleAddEvent = (e, userInput) => {
+    e.preventDefault()
+    if(userInput.jobName === '' ) {
+      alert('You must have an Event Title')
+      return
+    }
+
+    if(userInput.projectedHours === '' ) {
+      alert('You must have Projected Hours')
+      return
+    }
+    if(userInput.perDay === "") {
+      alert('You must have a Per Day Rate')
+      return
+    }
     // Checks to make sure a job doesn't already exist with the same name
     if (allEvents.some(event => event.jobName === userInput.jobName)) {
       alert(`An event with job name "${userInput.jobName}" already exists`);
@@ -456,49 +470,48 @@ function App() {
       </ReactModal>
 
       <ReactModal overlayClassName="Overlay" className="modalBasic" isOpen={modalCreateEventIsOpen} onRequestClose={() => setModalCreateEventIsOpen(false)}>
-        <div className="mainContainer">
-          <p>Event Title: </p>
-          <input
-            type="text"
-            placeholder="Add Title for Event"
-            className="titleInput"
-            value={newEvent.title}
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, jobName: e.target.value })
-            }
-          />
-          <br></br>
-          <p>Projected Hours: </p>
-          <input
-            type="number"
-            placeholder="Enter Projected hours"
-            value={newEvent.projectedHours}
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, projectedHours: e.target.value })
-            }
-          />
-          <br></br>
-          <p>PerDay Hour Rate: </p>
-          <input
-            type="number"
-            placeholder="Enter Daily Hours"
-            value={newEvent.perDay}
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, perDay: e.target.value })
-            }
-          />
-          <br></br>
-          <p>Start Date: </p>
-          <div className="datePickerContainer">
-            <DatePicker
-              placeholderText="Start Date"
-              selected={newEvent.start}
-              onChange={(start) => setNewEvent({ ...newEvent, start })}
+        <form>
+          <div className="mainContainer">
+            <p>Event Title: </p>
+            <input
+              type="text"
+              placeholder="Add Title for Event"
+              className="titleInput"
+              value={newEvent.title}
+              onChange={(e) =>
+                setNewEvent({ ...newEvent, jobName: e.target.value })
+              }
+              autoFocus
             />
-
-          </div>
-          <br></br>
-          <p>End Date: </p>
+            <br></br>
+            <p>Projected Hours: </p>
+            <input
+              type="number"
+              placeholder="Enter Projected hours"
+              value={newEvent.projectedHours}
+              onChange={(e) =>
+                setNewEvent({ ...newEvent, projectedHours: e.target.value })
+              }
+            />
+            <br></br>
+            <p>PerDay Hour Rate: </p>
+            <input
+              type="number"
+              placeholder="Enter Daily Hours"
+              value={newEvent.perDay}
+              onChange={(e) => setNewEvent({ ...newEvent, perDay: e.target.value })}
+            />
+            <br></br>
+            <p>Start Date: </p>
+            <div className="datePickerContainer">
+              <DatePicker
+                placeholderText="Start Date"
+                selected={newEvent.start}
+                onChange={(start) => setNewEvent({ ...newEvent, start })}
+              />
+            </div>
+            <br></br>
+            {/* <p>End Date: </p>
           <div className="datePickerContainer">
             <DatePicker
               placeholderText="End Date"
@@ -506,23 +519,24 @@ function App() {
               onChange={(end) => setNewEvent({ ...newEvent, end })}
             />
 
+          </div> */}
+            <br></br>
+            <select className="colorDropdown" onChange={handleColorDropdownChange}>
+              <option value="blue">Default Color</option>
+              <option value="red">Red</option>
+              <option value="green">Green</option>
+              <option value="blue">Blue</option>
+              <option value="yellow">Yellow</option>
+              <option value="orange">Orange</option>
+              <option value="purple">Purple</option>
+            </select>
+            <br></br>
+            <button type="submit" className="addEventButton" onClick={(e) => handleAddEvent(e, newEvent)}>
+              {" "}
+              Add Event{" "}
+            </button>
           </div>
-          <br></br>
-          <select className="colorDropdown" onChange={handleColorDropdownChange}>
-            <option value="blue" >Default Color</option>
-            <option value="red" >Red</option>
-            <option value="green" >Green</option>
-            <option value="blue" >Blue</option>
-            <option value="yellow" >Yellow</option>
-            <option value="orange" >Orange</option>
-            <option value="purple" >Purple</option>
-          </select>
-          <br></br>
-          <button className="addEventButton" onClick={(e) => handleAddEvent(newEvent)}>
-            {" "}
-            Add Event{" "}
-          </button>
-        </div>
+        </form>
       </ReactModal>
       <div className="testing">
         <DnDCalendar
