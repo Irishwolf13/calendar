@@ -61,7 +61,7 @@ function App() {
   const handleEventClicked = (event) => {
     setIsSelectable(false)
     setCurrentTitle(event.jobName);
-    console.log("Clicked Event: ", allEvents)
+    console.log("Clicked Event: ", JSON.stringify(event))
     setSelectedEvent(event);
     let currentDate = event.start.toLocaleDateString('en-US', {
       month: '2-digit',
@@ -122,9 +122,24 @@ function App() {
 
   const scheduleJob = (myJob, startIndex = 0) => {
     myJob.events = calculateJobEvents(myJob)
+    let myAdjustedJob = adjustForJSON(myJob)
+    console.log(JSON.stringify(myAdjustedJob))
     // This updates the calendar for the user
     setAllEvents([...allEvents, ...myJob.events]);
     // Going to need a fetch patch to the database to update the backend
+  }
+
+  const adjustForJSON = (object) => {
+    const adjustedObject = {
+      job_name: object.jobName,
+      start: object.start,
+      end: object.end,
+      projected_hours: object.projectedHours,
+      per_day: object.perDay,
+      color: object.eventColor,
+      events: object.events
+    }
+    return adjustedObject;
   }
 
   const calculateJobEvents = (myJob) => {
