@@ -53,11 +53,13 @@ function App() {
   const [newProjection, setNewProjection] = useState('');
 
   const [formattedDate, setFormattedDate] = useState("");
+  const [isSelectable, setIsSelectable] = useState(true);
 
   const handleModal = (mySetModal, myModal) => {
     mySetModal(!myModal);
   };
   const handleEventClicked = (event) => {
+    setIsSelectable(false)
     setCurrentTitle(event.jobName);
     console.log("Clicked Event: ", allEvents)
     setSelectedEvent(event);
@@ -188,6 +190,7 @@ function App() {
     changeEventPerDayHours(selectedEvent.jobName, selectedEvent.eventIndex, userInput)
     handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
     setNewPerDay(''); // Resets the form
+    setIsSelectable(true)
   };
 
   const handleProjectionChange = (e) => {
@@ -196,6 +199,7 @@ function App() {
     changeEventProjections(selectedEvent.jobName, newProjection)
     handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
     setNewProjection(''); // Resets the form
+    setIsSelectable(true)
   };
 
   const changeEventProjections = (titleToFind, userInput) => {
@@ -225,6 +229,7 @@ function App() {
     });
     // update the original allEvents array with the updatedEvents array
     setAllEvents(updatedEvents);
+    setIsSelectable(true)
   }
 
   const changeEventPerDayHours = (titleToFind, myIndex, newPerDay) => {
@@ -270,6 +275,7 @@ function App() {
           };
         }
       }
+      setIsSelectable(true)
       return event;
     });
     // update the original allEvents array with the updatedEvents array
@@ -285,6 +291,7 @@ function App() {
           title: `${changeTitle} -- ${event.perDay} / ${event.hoursLeft}`
         };
       }
+      setIsSelectable(true)
       return event;
     });
 
@@ -298,6 +305,7 @@ function App() {
     currentEvents.pop();
     const updatedEvents = [...filteredEvents, ...currentEvents];
     setAllEvents(updatedEvents);
+    setIsSelectable(true)
     if(currentEvents.length === 0) {
       handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
     }
@@ -333,6 +341,7 @@ function App() {
     // Update the state with the new array of events
     const updatedEvents = [...allEvents, newEvent];
     setAllEvents(updatedEvents);
+    setIsSelectable(true)
 
     // handleModal(setModalEventIsOpen, modalEventIsOpen); // Not sure I want this to close yet...
   }
@@ -403,6 +412,8 @@ function App() {
 
   const onSelectSlot = (e) => {
     // The next two lines adjust for onSelectSlot always choosing the end date 1 day after it should... not sure why.
+    console.log("e.Start: ",e.start)
+    console.log("e.End: ",e.end)
     const newEndDate = new Date(e.end);
     newEndDate.setDate(newEndDate.getDate() - 1);
     setNewEvent({ ...newEvent, start: e.start, end: newEndDate });
@@ -414,6 +425,11 @@ function App() {
 
   // function onDragStart({event}) {
   // }
+
+  const handleCloseEdit = () => {
+    handleModal(setModalEventIsOpen, modalEventIsOpen)
+    setIsSelectable(true)
+  }
 
   return (
     <div className="App">
@@ -463,7 +479,7 @@ function App() {
           <button type="submit">Submit</button>
         </form>
         </div>
-        <button className="closeModalButton" onClick={() => handleModal(setModalEventIsOpen, modalEventIsOpen)}>Close</button>
+        <button className="closeModalButton" onClick={() => handleCloseEdit()}>Close</button>
       </ReactModal>
 
       <ReactModal overlayClassName="Overlay" className="modalBasic" isOpen={modalCreateEventIsOpen} onRequestClose={() => setModalCreateEventIsOpen(false)}>
@@ -545,7 +561,7 @@ function App() {
           endAccessor="end"
           onSelectEvent={handleEventClicked}
           style={{ height: 700, margin: "20px", zIndex: 1 }}
-          selectable={true}
+          selectable={isSelectable}
           resizable={false}
           draggableAccessor={(event) => true}
           onEventDrop={onEventDrop}
