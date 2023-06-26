@@ -111,22 +111,53 @@ function App() {
       end: userInput.end,
       projectedHours: userInput.projectedHours,
       perDay: userInput.perDay,
-      eventColor: userInput.eventColor,
-      events: [{}]
+      eventColor: userInput.eventColor
     }
-    // **********************************************************************************************************
-    // I believe here is where we would want to post to the backend
-    // **********************************************************************************************************
     return job
   }
 
   const scheduleJob = (myJob, startIndex = 0) => {
     myJob.events = calculateJobEvents(myJob)
+    console.log('myJob.events: ', myJob.events)
+    // Post to back end here
+    // This is where the job itself is posting to the backend, without event information
+    // I believe the job SHOULD have the event information in it, but I'm not sure I've built
+    // this up correctly and here it is hurting.
     let myAdjustedJob = adjustForJSON(myJob)
-    console.log(JSON.stringify(myAdjustedJob))
+    saveJob(myAdjustedJob)
+    // This is where I have an array of events that I would like to post to the events backend.
+    // If I could get this bit to work, I believe the rest of the site would fall into line.
+    // It might not be the best solution, but it would work.
+    console.log(JSON.stringify(myJob.events))
+    fetch('http://localhost:3000/events',{
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify(myJob.events)
+    })
+    .then(res => res.json())
+    .then(data => console.log("Data: ",data))
+
     // This updates the calendar for the user
     setAllEvents([...allEvents, ...myJob.events]);
     // Going to need a fetch patch to the database to update the backend
+  }
+
+  const saveJob = (jobToSave) => {
+    fetch('http://localhost:3000/jobs',{
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify(jobToSave)
+    })
+    .then(res => {
+      if (res.ok) {
+        alert('Monster Saved!');
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log(data)
+    })
+    .catch(error => alert(`Error: ${error.message}`))
   }
 
   const adjustForJSON = (object) => {
@@ -167,15 +198,17 @@ function App() {
 
       if(myJob.perDay !== 0) {
         myArray.push({
+          job_id: 1,
           title: `${myJob.jobName} -- ${myJob.perDay} / ${myJob.hoursLeft}`,
-          jobName: myJob.jobName,
+          job_name: myJob.jobName,
           start: new Date(myCurrentDate),
           end: new Date(myCurrentDate),
-          initalHours: myJob.projectedHours,
-          hoursLeft: myHoursLeft,
-          perDay: myJob.perDay,
-          eventColor: myJob.eventColor,
-          eventIndex: myArray.length
+          inital_hours: myJob.projectedHours,
+          hours_left: myHoursLeft,
+          per_day: myJob.perDay,
+          color: myJob.eventColor,
+          index: myArray.length,
+          projected_hours: 0
         });
       }
     }
