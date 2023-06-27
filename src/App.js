@@ -111,7 +111,7 @@ function App() {
       end: userInput.end,
       projected_hours: userInput.projected_hours,
       per_day: userInput.per_day,
-      eventColor: userInput.eventColor
+      color: userInput.color
     }
     return job
   }
@@ -169,7 +169,7 @@ function App() {
   //     end: object.end,
   //     projected_hours: object.projected_hours,
   //     per_day: object.per_day,
-  //     color: object.eventColor,
+  //     color: object.color,
   //     events: object.events
   //   }
   //   return adjustedObject;
@@ -208,7 +208,7 @@ function App() {
           inital_hours: myJob.projected_hours,
           hours_left: myhours_left,
           per_day: myJob.per_day,
-          color: myJob.eventColor,
+          color: myJob.color,
           index: myArray.length,
           projected_hours: 0
         });
@@ -464,7 +464,7 @@ function App() {
   }
 
   const handleColorDropdownChange = (e) => {
-    setNewEvent({ ...newEvent, eventColor: e.target.value });
+    setNewEvent({ ...newEvent, color: e.target.value });
   }
 
   const onSelectSlot = (e) => {
@@ -625,11 +625,11 @@ function App() {
           // onDragStart={onDragStart}
           onSelectSlot={onSelectSlot}
           eventPropGetter={(event) =>
-            event.eventColor
+            event.color
               ? {
                   style: {
-                    background: event.eventColor,
-                    color: event.eventColor === 'rgb(172, 236, 253)' || event.eventColor === 'rgb(255, 255, 0)' || event.eventColor === 'orange' ? 'black' : ''
+                    background: event.color,
+                    color: event.color === 'rgb(172, 236, 253)' || event.color === 'rgb(255, 255, 0)' || event.color === 'orange' ? 'black' : ''
                   }
                 }
               : {}
