@@ -34,11 +34,11 @@ const events = [
 
 function App() {
   const [newEvent, setNewEvent] = useState({
-    jobName: "",
+    job_name: "",
     start: "",
     end: "",
-    projectedHours: "",
-    perDay: ""
+    projected_hours: "",
+    per_day: ""
   });
 
   const [allEvents, setAllEvents] = useState(events);
@@ -59,9 +59,9 @@ function App() {
     mySetModal(!myModal);
   };
   const handleEventClicked = (event) => {
+    console.log(selectedEvent)
     setIsSelectable(false)
-    setCurrentTitle(event.jobName);
-    console.log("Clicked Event: ", JSON.stringify(event))
+    setCurrentTitle(event.job_name);
     setSelectedEvent(event);
     let currentDate = event.start.toLocaleDateString('en-US', {
       month: '2-digit',
@@ -75,42 +75,42 @@ function App() {
 
   const handleAddEvent = (e, userInput) => {
     e.preventDefault()
-    if(userInput.jobName === '' ) {
+    if(userInput.job_name === '' ) {
       alert('You must have an Event Title') 
       return}
 
-    if(userInput.projectedHours === '' || userInput.projectedHours === "0") {
+    if(userInput.projected_hours === '' || userInput.projected_hours === "0") {
       alert('You must have Projected Hours')
       return
     }
-    if(userInput.perDay === "" || userInput.perDay === "0") {
+    if(userInput.per_day === "" || userInput.per_day === "0") {
       alert('You must have a Per Day Rate')
       return
     }
     // Checks to make sure a job doesn't already exist with the same name
-    if (allEvents.some(event => event.jobName === userInput.jobName)) {
-      alert(`An event with job name "${userInput.jobName}" already exists`);
+    if (allEvents.some(event => event.job_name === userInput.job_name)) {
+      alert(`An event with job name "${userInput.job_name}" already exists`);
       return
     }
     let jobToSchedule = createJob(userInput)
     scheduleJob(jobToSchedule)
     handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen); // Closes Modal
     setNewEvent({
-      jobName: "",
+      job_name: "",
       start: "",
       end: "",
-      projectedHours: "",
-      perDay: ""
+      projected_hours: "",
+      per_day: ""
     })
   };
 
   const createJob = (userInput) => {
     let job = {
-      jobName: userInput.jobName,
+      job_name: userInput.job_name,
       start: userInput.start,
       end: userInput.end,
-      projectedHours: userInput.projectedHours,
-      perDay: userInput.perDay,
+      projected_hours: userInput.projected_hours,
+      per_day: userInput.per_day,
       eventColor: userInput.eventColor
     }
     return job
@@ -118,73 +118,75 @@ function App() {
 
   const scheduleJob = (myJob, startIndex = 0) => {
     myJob.events = calculateJobEvents(myJob)
-    console.log('myJob.events: ', myJob.events)
-    // Post to back end here
-    // This is where the job itself is posting to the backend, without event information
-    // I believe the job SHOULD have the event information in it, but I'm not sure I've built
-    // this up correctly and here it is hurting.
-    let myAdjustedJob = adjustForJSON(myJob)
-    saveJob(myAdjustedJob)
-    // This is where I have an array of events that I would like to post to the events backend.
-    // If I could get this bit to work, I believe the rest of the site would fall into line.
-    // It might not be the best solution, but it would work.
-    console.log(JSON.stringify(myJob.events))
-    fetch('http://localhost:3000/events',{
-      method: 'POST',
-      headers: {'content-type': 'application/json'},
-      body: JSON.stringify(myJob.events)
-    })
-    .then(res => res.json())
-    .then(data => console.log("Data: ",data))
-
-    // This updates the calendar for the user
-    setAllEvents([...allEvents, ...myJob.events]);
-    // Going to need a fetch patch to the database to update the backend
-  }
-
-  const saveJob = (jobToSave) => {
     fetch('http://localhost:3000/jobs',{
       method: 'POST',
       headers: {'content-type': 'application/json'},
-      body: JSON.stringify(jobToSave)
+      body: JSON.stringify(myJob)
     })
     .then(res => {
-      if (res.ok) {
-        alert('Monster Saved!');
-      }
-      return res.json();
+      // console.log(JSON.stringify(myJob.events))
+      fetch('http://localhost:3000/events',{
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify(myJob.events)
+      })
+      .then(res => res.json())
+      // .then(data => console.log("Data: ",data))
+
+      // This updates the calendar for the user
+      setAllEvents([...allEvents, ...myJob.events]);
+      // return res.json();
     })
-    .then(data => {
-      console.log(data)
-    })
+    // .then(data => {
+    //   console.log(allEvents)
+    // })
     .catch(error => alert(`Error: ${error.message}`))
   }
 
-  const adjustForJSON = (object) => {
-    const adjustedObject = {
-      job_name: object.jobName,
-      start: object.start,
-      end: object.end,
-      projected_hours: object.projectedHours,
-      per_day: object.perDay,
-      color: object.eventColor,
-      events: object.events
-    }
-    return adjustedObject;
-  }
+
+  // const saveJob = (myAdjustedJob) => {
+  //   fetch('http://localhost:3000/jobs',{
+  //     method: 'POST',
+  //     headers: {'content-type': 'application/json'},
+  //     body: JSON.stringify(myAdjustedJob)
+  //   })
+  //   .then(res => {
+  //     if (res.ok) {
+  //       alert('Monster Saved!');
+  //     }
+  //     return res.json();
+  //   })
+  //   .then(data => {
+  //     console.log(data)
+  //   })
+  //   .catch(error => alert(`Error: ${error.message}`))
+  // }
+
+  // const adjustForJSON = (object) => {
+  //   const adjustedObject = {
+  //     job_name: object.job_name,
+  //     start: object.start,
+  //     end: object.end,
+  //     projected_hours: object.projected_hours,
+  //     per_day: object.per_day,
+  //     color: object.eventColor,
+  //     events: object.events
+  //   }
+  //   return adjustedObject;
+  // }
 
   const calculateJobEvents = (myJob) => {
-    myJob.hoursLeft = myJob.projectedHours;
+    myJob.hours_left = myJob.projected_hours;
     let myArray = [];
-    let myHoursLeft = myJob.projectedHours;
+    let myhours_left = myJob.projected_hours;
     let myCurrentDate = myJob.start;
     let isFirstIteration = true;
 
-    while (myHoursLeft >= (0 - myHoursLeft)) {
-      myHoursLeft -= myJob.perDay;
+    while (myhours_left >= (0 - myhours_left)) {
+      myhours_left -= myJob.per_day;
       if (!isFirstIteration) {
         myCurrentDate.setDate(myCurrentDate.getDate() + 1);
-        myJob.hoursLeft -= myJob.perDay;
+        myJob.hours_left -= myJob.per_day;
       }
       isFirstIteration = false;
 
@@ -192,20 +194,20 @@ function App() {
       myCurrentDate.setDate(myCurrentDate.getDate() + 2);
       }
 
-      if(myHoursLeft < 0) {
-        myJob.perDay = parseInt(myJob.perDay) + myHoursLeft
+      if(myhours_left < 0) {
+        myJob.per_day = parseInt(myJob.per_day) + myhours_left
       }
 
-      if(myJob.perDay !== 0) {
+      if(myJob.per_day !== 0) {
         myArray.push({
           job_id: 1,
-          title: `${myJob.jobName} -- ${myJob.perDay} / ${myJob.hoursLeft}`,
-          job_name: myJob.jobName,
+          title: `${myJob.job_name} -- ${myJob.per_day} / ${myJob.hours_left}`,
+          job_name: myJob.job_name,
           start: new Date(myCurrentDate),
           end: new Date(myCurrentDate),
-          inital_hours: myJob.projectedHours,
-          hours_left: myHoursLeft,
-          per_day: myJob.perDay,
+          inital_hours: myJob.projected_hours,
+          hours_left: myhours_left,
+          per_day: myJob.per_day,
           color: myJob.eventColor,
           index: myArray.length,
           projected_hours: 0
@@ -221,7 +223,7 @@ function App() {
     if (newTitle === '') {
       alert('Name change cannot be blank');
       return
-    } else if (allEvents.some(event => event.jobName === newTitle)) {
+    } else if (allEvents.some(event => event.job_name === newTitle)) {
       alert(`An event with title "${newTitle}" already exists.`);
       return
     }
@@ -231,11 +233,12 @@ function App() {
     setNewTitle(''); // Resets the form
   };
 
-  const handlePerDayChange = (e) => {
+  const handleper_dayChange = (e) => {
     e.preventDefault();
 
     let userInput = newPerDay  // Grab the user's input
-    changeEventPerDayHours(selectedEvent.jobName, selectedEvent.eventIndex, userInput)
+    console.log(selectedEvent)
+    changeEventPerDayHours(selectedEvent.job_name, selectedEvent.index, userInput)
     handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
     setNewPerDay(''); // Resets the form
     setIsSelectable(true)
@@ -244,7 +247,7 @@ function App() {
   const handleProjectionChange = (e) => {
     e.preventDefault();
 
-    changeEventProjections(selectedEvent.jobName, newProjection)
+    changeEventProjections(selectedEvent.job_name, newProjection)
     handleModal(setModalEventIsOpen, modalEventIsOpen); // Closes Modal
     setNewProjection(''); // Resets the form
     setIsSelectable(true)
@@ -255,22 +258,22 @@ function App() {
     let titleHours = null
     let titleRemaining = null
     const updatedEvents = allEvents.map(event => {
-      if (event.jobName === titleToFind) {
+      if (event.job_name === titleToFind) {
         if(titleHours === null) {
           titleHours = userInput
           // This sets up the next iteration
-          titleRemaining = event.perDay
+          titleRemaining = event.per_day
         } else {
           titleHours = titleHours - titleRemaining
           // This sets up the next iteration
-          titleRemaining = event.perDay
+          titleRemaining = event.per_day
         }
-        let hoursLeft = (userInput - (event.initalHours - event.hoursLeft))
+        let hours_left = (userInput - (event.inital_hours - event.hours_left))
         return {
           ...event,
-          title: `${event.jobName} -- ${event.perDay} / ${titleHours}`,
-          hoursLeft: hoursLeft,
-          initalHours: userInput
+          title: `${event.job_name} -- ${event.per_day} / ${titleHours}`,
+          hours_left: hours_left,
+          inital_hours: userInput
         };
       }
       return event;
@@ -281,45 +284,51 @@ function App() {
   }
 
   const changeEventPerDayHours = (titleToFind, myIndex, newPerDay) => {
+    console.log('titleToFind', titleToFind)
+    console.log("myIndex", myIndex)
+    console.log("newPerDay", newPerDay)
     newPerDay = parseInt(newPerDay)
-    let previousPerDay = 0;
+    let previousper_day = 0;
     let hoursRemaining = 0;
     let tempHours = 0;
     const updatedEvents = allEvents.map(event => {
-      if(event.jobName === titleToFind){
-        if (myIndex === 0 && myIndex === event.eventIndex) {
-          hoursRemaining = parseInt(event.initalHours);
-          previousPerDay = parseInt(newPerDay)
+      if(event.job_name === titleToFind){
+        if (myIndex === 0 && myIndex === event.index) {
+          console.log("First", event)
+          hoursRemaining = parseInt(event.inital_hours);
+          previousper_day = parseInt(newPerDay)
           return {
             ...event,
-            title: `${event.jobName} -- ${newPerDay} / ${parseInt(event.initalHours)}`,
-            perDay: parseInt(newPerDay),
-            hoursLeft: (parseInt(event.hoursLeft) + (parseInt(event.perDay) - parseInt(newPerDay)))
+            title: `${event.job_name} -- ${newPerDay} / ${parseInt(event.inital_hours)}`,
+            per_day: parseInt(newPerDay),
+            hours_left: (parseInt(event.hours_left) + (parseInt(event.per_day) - parseInt(newPerDay)))
           };
         }
-        if (myIndex > event.eventIndex) {
-          hoursRemaining = parseInt(event.hoursLeft)
-          previousPerDay = parseInt(event.perDay);
+        if (myIndex > event.index) {
+          console.log("Middle", event)
+          hoursRemaining = parseInt(event.hours_left)
+          previousper_day = parseInt(event.per_day);
           return {...event}
         }
-        if (myIndex === event.eventIndex) {
+        if (myIndex === event.index) {
+          console.log("End", event)
           hoursRemaining = parseInt(hoursRemaining);
-          previousPerDay = parseInt(newPerDay)
-          // let frank = (parseInt(event.hoursLeft) + (parseInt(event.perDay) - parseInt(newPerDay)))
+          previousper_day = parseInt(newPerDay)
+          // let frank = (parseInt(event.hours_left) + (parseInt(event.per_day) - parseInt(newper_day)))
           return {
             ...event,
-            title: `${event.jobName} -- ${newPerDay} / ${hoursRemaining}`,
-            perDay: parseInt(newPerDay),
-            hoursLeft: (parseInt(event.hoursLeft) + (parseInt(event.perDay) - parseInt(newPerDay)))
+            title: `${event.job_name} -- ${newPerDay} / ${hoursRemaining}`,
+            per_day: parseInt(newPerDay),
+            hours_left: (parseInt(event.hours_left) + (parseInt(event.per_day) - parseInt(newPerDay)))
           };
         }
-        if (myIndex < event.eventIndex) {
-          hoursRemaining = parseInt(hoursRemaining) - parseInt(previousPerDay)
-          previousPerDay = parseInt(event.perDay);
+        if (myIndex < event.index) {
+          hoursRemaining = parseInt(hoursRemaining) - parseInt(previousper_day)
+          previousper_day = parseInt(event.per_day);
           return {
             ...event,
-            title: `${event.jobName} -- ${event.perDay} / ${hoursRemaining}`,
-            hoursLeft: (parseInt(event.hoursLeft) + (parseInt(event.perDay) - parseInt(newPerDay)))
+            title: `${event.job_name} -- ${event.per_day} / ${hoursRemaining}`,
+            hours_left: (parseInt(event.hours_left) + (parseInt(event.per_day) - parseInt(newPerDay)))
           };
         }
       }
@@ -332,11 +341,11 @@ function App() {
 
   const changeEventTitles = (titleToFind, changeTitle) => {
     const updatedEvents = allEvents.map(event => {
-      if (event.jobName === titleToFind) {
+      if (event.job_name === titleToFind) {
         return {
           ...event,
-          jobName: changeTitle,
-          title: `${changeTitle} -- ${event.perDay} / ${event.hoursLeft}`
+          job_name: changeTitle,
+          title: `${changeTitle} -- ${event.per_day} / ${event.hours_left}`
         };
       }
       setIsSelectable(true)
@@ -347,9 +356,9 @@ function App() {
     setAllEvents(updatedEvents);
   }
 
-  const handleRemoveDay = (event, jobName) => {
-    let currentEvents = allEvents.filter(event => event.jobName === jobName);
-    let filteredEvents = allEvents.filter((currentEvent) => currentEvent.jobName !== jobName);
+  const handleRemoveDay = (event, job_name) => {
+    let currentEvents = allEvents.filter(event => event.job_name === job_name);
+    let filteredEvents = allEvents.filter((currentEvent) => currentEvent.job_name !== job_name);
     currentEvents.pop();
     const updatedEvents = [...filteredEvents, ...currentEvents];
     setAllEvents(updatedEvents);
@@ -359,15 +368,15 @@ function App() {
     }
   }
 
-  const handleAddDay = (event, jobName) => {
-    const filteredEvents = allEvents.filter(event => event.jobName === jobName);
+  const handleAddDay = (event, job_name) => {
+    const filteredEvents = allEvents.filter(event => event.job_name === job_name);
     const highestEvent = filteredEvents.reduce((highest, current) => {
-      if (current.eventIndex > highest.eventIndex) {
+      if (current.index > highest.index) {
         return current;
       } else {
         return highest;
       }
-    }, { eventIndex: -1 });
+    }, { index: -1 });
 
     // Create a new Date object with highestEvent.start and add one day
     let newStartDate = new Date(highestEvent.start.getTime() + (86400000));
@@ -380,9 +389,9 @@ function App() {
 
     // Creates a copy of the previous last event, and adjusts the new info
     let newEvent = Object.assign({}, highestEvent);
-    newEvent.eventIndex = highestEvent.eventIndex + 1
-    newEvent.title = `${newEvent.jobName} -- ${newEvent.perDay} / ${newEvent.hoursLeft}`;
-    newEvent.hoursLeft = highestEvent.hoursLeft - newEvent.perDay
+    newEvent.index = highestEvent.index + 1
+    newEvent.title = `${newEvent.job_name} -- ${newEvent.per_day} / ${newEvent.hours_left}`;
+    newEvent.hours_left = highestEvent.hours_left - newEvent.per_day
     newEvent.start = newStartDate;
     newEvent.end = newStartDate;
 
@@ -397,8 +406,8 @@ function App() {
 
   function onEventDrop({event, start, end}) {
     // Make sure events can't have a date earlier than their previous Index
-    if(event.eventIndex > 0) {
-      const prevEvent = allEvents.find(e => e.jobName === event.jobName && e.eventIndex === event.eventIndex - 1);
+    if(event.index > 0) {
+      const prevEvent = allEvents.find(e => e.job_name === event.job_name && e.index === event.index - 1);
       if (start.getTime() <= prevEvent.start.getTime()) {
         return
       }
@@ -411,7 +420,7 @@ function App() {
     // Map over all events and update the start and end dates based on the differenceOfDates
     let newCurrentEvent = '';
     updatedEvents = allEvents.map((currentEvent, index) => {
-      if(currentEvent.jobName === event.jobName && currentEvent.eventIndex === event.eventIndex){
+      if(currentEvent.job_name === event.job_name && currentEvent.index === event.index){
         let adjustedStart = new Date(currentEvent.start.getTime() + differenceOfDates);
         let adjustedEnd = new Date(currentEvent.end.getTime() + differenceOfDates);
         newCurrentEvent = {
@@ -425,7 +434,7 @@ function App() {
           end: adjustedEnd
         }
       }
-      if(currentEvent.jobName === event.jobName && currentEvent.eventIndex > event.eventIndex) {
+      if(currentEvent.job_name === event.job_name && currentEvent.index > event.index) {
         if (newCurrentEvent) {
           const adjustedStart = new Date(newCurrentEvent.start.getTime() + 86400000);
           const adjustedEnd = new Date(newCurrentEvent.start.getTime() + 86400000);
@@ -460,8 +469,8 @@ function App() {
 
   const onSelectSlot = (e) => {
     // The next two lines adjust for onSelectSlot always choosing the end date 1 day after it should... not sure why.
-    console.log("e.Start: ",e.start)
-    console.log("e.End: ",e.end)
+    // console.log("e.Start: ",e.start)
+    // console.log("e.End: ",e.end)
     const newEndDate = new Date(e.end);
     newEndDate.setDate(newEndDate.getDate() - 1);
     setNewEvent({ ...newEvent, start: e.start, end: newEndDate });
@@ -485,16 +494,16 @@ function App() {
       <button onClick={() => handleModal(setModalCreateEventIsOpen, modalCreateEventIsOpen)}>Create New Event</button>
 
       <ReactModal overlayClassName="Overlay" className="modalBasic" isOpen={modalEventIsOpen} onRequestClose={() => setModalEventIsOpen(false)}>
-        <button className="deleteButton" onClick={(e) => handleAddDay(e, selectedEvent.jobName)}>Add Day</button>
-        <button className="deleteButton" onClick={(e) => handleRemoveDay(e, selectedEvent.jobName)}>Remove Day</button>
-        <h2>{`${selectedEvent.jobName} - ${formattedDate}`}</h2>
+        <button className="deleteButton" onClick={(e) => handleAddDay(e, selectedEvent.job_name)}>Add Day</button>
+        <button className="deleteButton" onClick={(e) => handleRemoveDay(e, selectedEvent.job_name)}>Remove Day</button>
+        <h2>{`${selectedEvent.job_name} - ${formattedDate}`}</h2>
         <div>
         <form onSubmit={handleNameChange}>
           <label>
             Name Change :
             <input
               type="text"
-              placeholder={selectedEvent.jobName}
+              placeholder={selectedEvent.job_name}
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
             />
@@ -506,19 +515,19 @@ function App() {
             Job Projection :
             <input
               type="number"
-              placeholder={selectedEvent.initalHours}
+              placeholder={selectedEvent.inital_hours}
               value={newProjection}
               onChange={(e) => setNewProjection(e.target.value)}
             />
           </label>
           <button type="submit">Submit</button>
         </form>
-        <form onSubmit={handlePerDayChange}>
+        <form onSubmit={handleper_dayChange}>
           <label>
             Hours Per Day :
             <input
               type="number"
-              placeholder={selectedEvent.perDay}
+              placeholder={selectedEvent.per_day}
               value={newPerDay}
               onChange={(e) => setNewPerDay(e.target.value)}
               autoFocus
@@ -540,7 +549,7 @@ function App() {
               className="titleInput"
               value={newEvent.title}
               onChange={(e) =>
-                setNewEvent({ ...newEvent, jobName: e.target.value })
+                setNewEvent({ ...newEvent, job_name: e.target.value })
               }
               autoFocus
             />
@@ -549,18 +558,18 @@ function App() {
             <input
               type="number"
               placeholder="Enter Projected hours"
-              value={newEvent.projectedHours}
+              value={newEvent.projected_hours}
               onChange={(e) =>
-                setNewEvent({ ...newEvent, projectedHours: e.target.value })
+                setNewEvent({ ...newEvent, projected_hours: e.target.value })
               }
             />
             <br></br>
-            <p>PerDay Hour Rate: </p>
+            <p>per_day Hour Rate: </p>
             <input
               type="number"
               placeholder="Enter Daily Hours"
-              value={newEvent.perDay}
-              onChange={(e) => setNewEvent({ ...newEvent, perDay: e.target.value })}
+              value={newEvent.per_day}
+              onChange={(e) => setNewEvent({ ...newEvent, per_day: e.target.value })}
             />
             <br></br>
             <p>Start Date: </p>
